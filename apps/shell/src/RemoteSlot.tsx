@@ -1,9 +1,10 @@
 import { Component, lazy, Suspense, useState, type ReactNode } from 'react';
 import { Container, Notice } from '@clash-cup/ui';
-import { loadPortal } from './runtime';
+import type { RemoteName } from '@clash-cup/contracts';
+import { loadRemoteApp } from './runtime';
 
 class RemoteBoundary extends Component<
-  { children: ReactNode; retry: () => void },
+  { children: ReactNode; retry: () => void; label: string },
   { failed: boolean }
 > {
   state = { failed: false };
@@ -14,7 +15,7 @@ class RemoteBoundary extends Component<
     return this.state.failed ? (
       <Container>
         <Notice role="alert">
-          <h1>Não foi possível carregar o portal.</h1>
+          <h1>Não foi possível carregar {this.props.label}.</h1>
           <p>O serviço pode estar temporariamente indisponível.</p>
           <button onClick={this.props.retry}>Tentar novamente</button>
         </Notice>
@@ -25,17 +26,21 @@ class RemoteBoundary extends Component<
   }
 }
 
-export function RemoteSlot() {
+export function RemoteSlot({ name = 'portal' }: { name?: RemoteName }) {
   const [{ attempt, Remote }, setSlot] = useState(() => ({
     attempt: 0,
-    Remote: lazy(() => loadPortal()),
+    Remote: lazy(() => loadRemoteApp(name)),
   }));
   function retry() {
     const nextAttempt = attempt + 1;
-    setSlot({ attempt: nextAttempt, Remote: lazy(() => loadPortal(nextAttempt)) });
+    setSlot({ attempt: nextAttempt, Remote: lazy(() => loadRemoteApp(name, nextAttempt)) });
   }
   return (
-    <RemoteBoundary key={attempt} retry={retry}>
+    <RemoteBoundary
+      key={attempt}
+      retry={retry}
+      label={name === 'portal' ? 'o portal' : 'o acesso à conta'}
+    >
       <Suspense
         fallback={
           <Container>

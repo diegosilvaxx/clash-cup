@@ -8,12 +8,26 @@ vi.mock('@clash-cup/http', () => ({ createHttpClient: () => ({ get: mocks.get })
 beforeEach(() => {
   vi.resetModules();
   mocks.get.mockResolvedValue({
-    data: { remotes: { portal: 'http://127.0.0.1:5301/remoteEntry.js' } },
+    data: {
+      remotes: {
+        portal: 'http://127.0.0.1:5301/remoteEntry.js',
+        auth: 'http://127.0.0.1:5302/remoteEntry.js',
+      },
+    },
   });
   mocks.loadRemote.mockResolvedValue({ App: () => null });
 });
 
 describe('remote recovery', () => {
+  it('keeps portal and authentication registrations independent', async () => {
+    const { loadRemoteApp } = await import('./runtime');
+    await loadRemoteApp('portal');
+    await loadRemoteApp('auth', 1);
+    await loadRemoteApp('portal');
+    expect(mocks.registerRemotes).toHaveBeenCalledTimes(2);
+    expect(mocks.registerRemotes.mock.calls[0]?.[0][0].name).toBe('portal');
+    expect(mocks.registerRemotes.mock.calls[1]?.[0][0].name).toBe('auth');
+  });
   it('preserves the recovered entry after navigating away and mounting again', async () => {
     const { loadPortal } = await import('./runtime');
     mocks.loadRemote.mockRejectedValueOnce(new Error('offline'));
@@ -29,7 +43,12 @@ describe('remote recovery', () => {
     const { loadPortal } = await import('./runtime');
     await loadPortal();
     mocks.get.mockResolvedValue({
-      data: { remotes: { portal: 'https://example.com/remoteEntry.js' } },
+      data: {
+        remotes: {
+          portal: 'https://example.com/remoteEntry.js',
+          auth: 'http://127.0.0.1:5302/remoteEntry.js',
+        },
+      },
     });
     await loadPortal();
     expect(mocks.registerRemotes.mock.calls[1]?.[0][0].entry).toBe(

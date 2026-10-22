@@ -30,9 +30,12 @@ export const HeaderContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 24px;
   nav {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 24px;
     font-size: 14px;
   }
@@ -60,6 +63,9 @@ export const Brand = styled(Link)`
 export const Main = styled.main`
   width: 100%;
   flex: 1;
+  &:focus {
+    outline: none;
+  }
 `;
 export const Footer = styled.footer`
   padding: 28px 24px;

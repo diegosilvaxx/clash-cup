@@ -19,6 +19,8 @@ async function visit(directory) {
     const imports = [...source.matchAll(/(?:from\s*|import\s*\()['"]([^'"]+)['"]/g)];
     for (const match of imports) {
       const specifier = match[1];
+      if (app && app !== 'api' && /^firebase(?:\/|$)/.test(specifier))
+        failures.push(`${name}: use a sessão compartilhada para acessar Firebase`);
       if (specifier.startsWith('.')) {
         const target = relative(root, resolve(directory, specifier)).replaceAll('\\', '/');
         const targetApp = target.match(/^apps\/([^/]+)\//)?.[1];

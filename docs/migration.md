@@ -20,7 +20,7 @@ O site PHP consulta tabelas MySQL, enquanto a aplicação React consulta Firesto
 | ------------- | ----------------------------------------------------------------------- | --------------------------------- |
 | `shell`       | Layout, navegação, rotas, carregamento e recuperação dos remotos        | Base implementada                 |
 | `portal`      | Conteúdo público: apresentação, regras, contato, apoiadores e políticas | Apresentação inicial implementada |
-| `auth`        | Login, cadastro, saída e vínculo inicial com jogador                    | Próxima etapa                     |
+| `auth`        | Login, cadastro, saída e vínculo inicial com jogador                    | Base implementada                 |
 | `competition` | Torneios, inscrições, meus torneios e ranking                           | Planejada                         |
 | `player`      | Perfil, baús, área VIP, loja e emblemas                                 | Planejada                         |
 | `admin`       | Administração de torneios, ranking e permissões                         | Planejada                         |
@@ -31,7 +31,8 @@ Os limites seguem responsabilidades de produto. A API é backend; ela não é um
 ```mermaid
 flowchart LR
   Shell --> Portal
-  Shell -.-> Auth
+  Shell --> Auth
+  Auth --> API
   Shell -.-> Competition
   Shell -.-> Player
   Shell -.-> Admin
@@ -46,7 +47,7 @@ As ligações tracejadas representam integrações ainda não implementadas.
 ## Plano por etapas
 
 1. **Fundação:** npm workspaces, TypeScript, React, styled-components, Module Federation, shell, apresentação pública inicial, API com Axios/Zod e testes da integração. Sem credenciais copiadas do legado.
-2. **Autenticação:** pacote compartilhado para sessão Firebase, estados de carregamento, Google, cadastro e vínculo da tag. Adicionar o remoto `auth`, rotas acessíveis por URL e testes com ambiente de desenvolvimento isolado. Definir a manutenção do cadastro por email/senha.
+2. **Autenticação:** pacote compartilhado para sessão Firebase, estados de carregamento, Google, cadastro e vínculo da tag. Adicionar o remoto `auth`, rotas acessíveis por URL e testes com ambiente de desenvolvimento isolado. Google e email/senha foram mantidos. Detalhes em [Autenticação](authentication.md).
 3. **Competições:** remoto `competition`, listas de torneios, detalhes, inscrições e meus torneios. Preservar campos e identificadores existentes; controlar concorrência de vagas com operações atômicas. Revisar dados MySQL/Firestore antes de qualquer importação.
 4. **Área do jogador:** remoto `player`, perfil, baús e área VIP. Integrar a API pelo mesmo domínio e cancelar consultas substituídas. Adicionar cache somente onde a política de validade estiver definida.
 5. **Loja e ranking:** saldo, emblemas, histórico e ranking. Validar saldo e propriedade no backend/regras do banco; transferências e débitos precisam ser atômicos. Importações de resultados devem ser idempotentes para evitar pontuação duplicada.
@@ -62,7 +63,7 @@ Cada etapa termina com verificações e um conjunto de alterações para revisã
 - Cada remoto oferece conteúdo federado e inicialização independente. O conteúdo federado não cria um segundo roteador.
 - A sessão deve ter uma única fonte de verdade compartilhada; cada remoto não deve inicializar uma sessão Firebase diferente.
 - Firebase Authentication e Firestore serão preservados inicialmente. Trocar a arquitetura de frontend não exige trocar o banco.
-- O pacote de dados Firebase será adicionado junto das regras e testes de autorização. A primeira etapa não lê nem grava em dados existentes.
+- A etapa 2 adiciona o pacote `session`, novos vínculos por UID e regras de transição para a coleção `playerProfiles`. A leitura de vínculos antigos por email confirmado não altera os documentos do legado. Veja [Autenticação](authentication.md) para configuração, limites dos testes e permissões ainda preservadas nas coleções antigas.
 - A API mantém os três caminhos anteriores, valida a entrada e a estrutura mínima da resposta e preserva campos adicionais consumidos no legado.
 - As credenciais vêm do ambiente. A configuração pública do Firebase e os segredos do backend devem ter fluxos distintos.
 

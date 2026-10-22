@@ -5,7 +5,11 @@ export default defineConfig({
   timeout: 45_000,
   expect: { timeout: 12_000 },
   workers: 1,
-  reporter: [['list'], ['html', { open: 'never' }]],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+    ['json', { outputFile: 'test-results/results.json' }],
+  ],
   use: {
     baseURL: 'http://127.0.0.1:5300',
     browserName: 'chromium',
@@ -21,9 +25,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'node scripts/dev.mjs --preview',
+    command: 'node scripts/e2e-server.mjs',
     url: 'http://127.0.0.1:5300',
     reuseExistingServer: false,
-    timeout: 60_000,
+    timeout: 120_000,
   },
 });

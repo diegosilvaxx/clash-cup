@@ -1,12 +1,33 @@
-import { Route, Routes, Link } from 'react-router-dom';
-import { Container, PageLayout } from '@clash-cup/ui';
+import { Route, Routes, Link, Navigate } from 'react-router-dom';
+import { AccountMenu, Container, PageLayout } from '@clash-cup/ui';
+import { session, useSession } from '@clash-cup/session';
 import { RemoteSlot } from './RemoteSlot';
 
 export function App() {
+  const state = useSession();
   return (
-    <PageLayout>
+    <PageLayout
+      accountMenu={
+        <AccountMenu
+          key={state.user?.uid ?? 'anonymous'}
+          authenticated={state.status === 'authenticated'}
+          initializing={state.status === 'initializing'}
+          pending={state.pending}
+          onSignOut={session.signOut}
+        />
+      }
+    >
       <Routes>
-        <Route path="/" element={<RemoteSlot />} />
+        <Route path="/" element={<RemoteSlot key="portal" />} />
+        {['/entrar', '/cadastro', '/vincular-jogador', '/minha-conta'].map((path) => (
+          <Route key={path} path={path} element={<RemoteSlot key="auth" name="auth" />} />
+        ))}
+        <Route path="/signup" element={<Navigate replace to="/cadastro" />} />
+        <Route
+          path="/registerIdClashRoyale"
+          element={<Navigate replace to="/vincular-jogador" />}
+        />
+        <Route path="/dashboard" element={<Navigate replace to="/minha-conta" />} />
         <Route
           path="/sobre"
           element={

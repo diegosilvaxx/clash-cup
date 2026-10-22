@@ -1,10 +1,18 @@
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 import { aliases } from './tooling/aliases.ts';
+import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
   plugins: [react()],
-  resolve: { alias: aliases },
+  resolve: {
+    alias: {
+      ...aliases,
+      '@clash-cup/session': fileURLToPath(
+        new URL('./packages/session/src/index.ts', import.meta.url),
+      ),
+    },
+  },
   test: {
     pool: 'threads',
     environment: 'node',

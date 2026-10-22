@@ -2,8 +2,15 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Brand, Footer, Frame, GlobalStyle, Header, HeaderContent, Main, SkipLink } from './styles';
 export { ActionLink, Container, Notice } from './styles';
+export { AccountMenu } from './AccountMenu';
 
-export function PageLayout({ children }: { children: ReactNode }) {
+export function PageLayout({
+  children,
+  accountMenu,
+}: {
+  children: ReactNode;
+  accountMenu?: ReactNode;
+}) {
   return (
     <Frame>
       <GlobalStyle />
@@ -16,6 +23,7 @@ export function PageLayout({ children }: { children: ReactNode }) {
           <nav aria-label="Navegação principal">
             <Link to="/">Início</Link>
             <Link to="/sobre">Sobre</Link>
+            {accountMenu}
           </nav>
         </HeaderContent>
       </Header>

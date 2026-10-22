@@ -1,18 +1,19 @@
 import type { ComponentType } from 'react';
 import { getInstance } from '@module-federation/runtime';
-import { runtimeConfigSchema } from '@clash-cup/contracts';
+import { runtimeConfigSchema, type RemoteName } from '@clash-cup/contracts';
 import { createHttpClient } from '@clash-cup/http';
 
 const http = createHttpClient('/');
-let registration: { configuredEntry: string; entry: string } | undefined;
+const registrations = new Map<RemoteName, { configuredEntry: string; entry: string }>();
 
-export async function loadPortal(attempt = 0) {
+export async function loadRemoteApp(name: RemoteName, attempt = 0) {
   const response = await http.get<unknown>('/runtime-config.json', {
     params: { attempt },
     headers: { 'Cache-Control': 'no-cache' },
   });
   const config = runtimeConfigSchema.parse(response.data);
-  const configuredEntry = new URL(config.remotes.portal).href;
+  const configuredEntry = new URL(config.remotes[name]).href;
+  const registration = registrations.get(name);
   const entry = new URL(
     attempt === 0 && registration?.configuredEntry === configuredEntry
       ? registration.entry
@@ -22,15 +23,15 @@ export async function loadPortal(attempt = 0) {
   const runtime = getInstance((instance) => instance.name === 'shell');
   if (!runtime) throw new Error('Runtime indisponível.');
   if (registration?.entry !== entry.href) {
-    runtime.registerRemotes([{ name: 'portal', entry: entry.href, type: 'module' }], {
+    runtime.registerRemotes([{ name, entry: entry.href, type: 'module' }], {
       force: Boolean(registration),
     });
-    registration = { configuredEntry, entry: entry.href };
+    registrations.set(name, { configuredEntry, entry: entry.href });
   }
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const module = await Promise.race([
-      runtime.loadRemote<{ App: ComponentType }>('portal/App'),
+      runtime.loadRemote<{ App: ComponentType }>(`${name}/App`),
       new Promise<never>((_, reject) => {
         timer = setTimeout(() => reject(new Error('Tempo de carregamento excedido.')), 10_000);
       }),
@@ -41,3 +42,5 @@ export async function loadPortal(attempt = 0) {
     clearTimeout(timer);
   }
 }
+
+export const loadPortal = (attempt = 0) => loadRemoteApp('portal', attempt);

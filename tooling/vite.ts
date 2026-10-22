@@ -5,13 +5,16 @@ import { defineConfig, loadEnv, type Plugin } from 'vite';
 import { runtimeConfigSchema } from '../packages/contracts/src/index.ts';
 import { aliases, repositoryRoot } from './aliases.ts';
 
-const ports = { shell: 5300, portal: 5301 } as const;
+const ports = { shell: 5300, portal: 5301, auth: 5302 } as const;
 
 function runtimeConfigPlugin(mode: string): Plugin {
   const env = loadEnv(mode, repositoryRoot, 'CUP_');
   const content = JSON.stringify(
     runtimeConfigSchema.parse({
-      remotes: { portal: env.CUP_PORTAL_REMOTE_URL || 'http://127.0.0.1:5301/remoteEntry.js' },
+      remotes: {
+        portal: env.CUP_PORTAL_REMOTE_URL || 'http://127.0.0.1:5301/remoteEntry.js',
+        auth: env.CUP_AUTH_REMOTE_URL || 'http://127.0.0.1:5302/remoteEntry.js',
+      },
     }),
   );
   return {
@@ -52,6 +55,15 @@ export function createAppConfig(application: keyof typeof ports) {
             'react-router-dom': { singleton: true, requiredVersion: '7.18.4' },
             'react-router': { singleton: true, requiredVersion: '7.18.4' },
             'styled-components': { singleton: true, requiredVersion: '6.5.3' },
+            '@clash-cup/session': {
+              singleton: true,
+              version: '0.1.0',
+              requiredVersion: '0.1.0',
+              import: resolve(repositoryRoot, 'packages/session/src/index.ts').replaceAll(
+                '\\',
+                '/',
+              ),
+            },
           },
         }),
         ...(application === 'shell' ? [runtimeConfigPlugin(mode)] : []),
@@ -78,7 +90,7 @@ export function createAppConfig(application: keyof typeof ports) {
       },
       build: {
         target: 'es2022',
-        outDir: resolve(repositoryRoot, 'dist', application),
+        outDir: resolve(repositoryRoot, mode === 'e2e' ? 'dist/e2e' : 'dist', application),
         emptyOutDir: true,
       },
     };

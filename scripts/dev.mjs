@@ -5,6 +5,7 @@ import { tsImport } from 'tsx/esm/api';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const production = process.argv.includes('--preview');
+const mode = process.argv.includes('--e2e') ? 'e2e' : production ? 'production' : 'development';
 const servers = [];
 let api;
 let closing = false;
@@ -39,8 +40,9 @@ try {
       });
   api = await backend.startApi(root);
   console.log(`API: http://127.0.0.1:${api.address().port}`);
-  for (const app of ['shell', 'portal']) {
+  for (const app of ['shell', 'portal', 'auth']) {
     const options = {
+      mode,
       configFile: resolve(root, 'apps', app, 'vite.config.ts'),
       root: resolve(root, 'apps', app),
     };

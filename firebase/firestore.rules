@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Legacy permissions remain unchanged during the staged migration.
+    match /{collection}/{document=**} {
+      allow read, write: if request.auth != null && collection != 'playerProfiles';
+    }
+
+    match /playerProfiles/{uid} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == uid;
+      }
+
+      function isValidProfile() {
+        let data = request.resource.data;
+        return data.keys().hasAll(['uid', 'idUser', 'idClashRoyale', 'nome'])
+          && data.keys().hasOnly(['uid', 'idUser', 'idClashRoyale', 'nome'])
+          && data.uid == request.auth.uid
+          && data.idUser == request.auth.token.get('email', '')
+          && data.idClashRoyale is string
+          && data.idClashRoyale.matches('^#[A-Z0-9]{3,20}$')
+          && data.nome is string
+          && data.nome.size() > 0
+          && data.nome.size() <= 100;
+      }
+
+      allow get: if isOwner();
+      allow create: if isOwner() && isValidProfile();
+      allow list, update, delete: if false;
+    }
+
+    match /tournament/{document} { allow read: if true; }
+    match /shop/{document} { allow read: if true; }
+    match /ranking/{document} { allow read: if true; }
+    match /rankingHistory/{document} { allow read: if true; }
+  }
+}

@@ -18,9 +18,13 @@ export const tournamentSchema = z
     ),
   })
   .passthrough();
+const remoteUrlSchema = z
+  .url()
+  .refine((url) => ['http:', 'https:'].includes(new URL(url).protocol));
 export const runtimeConfigSchema = z.object({
   remotes: z.object({
-    portal: z.url().refine((url) => ['http:', 'https:'].includes(new URL(url).protocol)),
+    portal: remoteUrlSchema,
+    auth: remoteUrlSchema,
   }),
 });
 export const apiErrorSchema = z.object({
@@ -29,3 +33,23 @@ export const apiErrorSchema = z.object({
 export type RuntimeConfig = z.infer<typeof runtimeConfigSchema>;
 export type Player = z.infer<typeof playerSchema>;
 export type Tournament = z.infer<typeof tournamentSchema>;
+export type RemoteName = keyof RuntimeConfig['remotes'];
+
+const emailSchema = z.string().trim().pipe(z.email('Informe um email válido.'));
+export const signInSchema = z.object({
+  email: emailSchema,
+  password: z.string().min(1, 'Informe sua senha.'),
+});
+export const signUpSchema = z
+  .object({
+    email: emailSchema,
+    password: z
+      .string()
+      .min(6, 'Use pelo menos 6 caracteres.')
+      .max(128, 'Use no máximo 128 caracteres.'),
+    confirmPassword: z.string().min(1, 'Confirme sua senha.'),
+  })
+  .refine((fields) => fields.password === fields.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'As senhas precisam ser iguais.',
+  });
