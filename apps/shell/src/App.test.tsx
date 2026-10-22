@@ -13,6 +13,9 @@ vi.mock('./RemoteSlot', () => ({
     <Routes>
       <Route path="/" element={<h1>Portal {name}</h1>} />
       <Route path="/entrar" element={<h1>Login {name}</h1>} />
+      <Route path="/perfil" element={<h1>Perfil {name}</h1>} />
+      <Route path="/baus" element={<h1>Baús {name}</h1>} />
+      <Route path="/area-vip" element={<h1>VIP {name}</h1>} />
       <Route
         path="/torneios/:id"
         element={
@@ -30,6 +33,9 @@ describe('shell route composition', () => {
   it.each([
     ['/', 'Portal portal'],
     ['/entrar', 'Login auth'],
+    ['/perfil', 'Perfil player'],
+    ['/baus', 'Baús player'],
+    ['/area-vip', 'VIP player'],
     ['/torneios/cup', 'Detalhes competition'],
   ])('provides the root route context to %s', (path, heading) => {
     render(

@@ -40,7 +40,7 @@ try {
       });
   api = await backend.startApi(root);
   console.log(`API: http://127.0.0.1:${api.address().port}`);
-  for (const app of ['shell', 'portal', 'auth', 'competition']) {
+  for (const app of ['shell', 'portal', 'auth', 'competition', 'player']) {
     const options = {
       mode,
       configFile: resolve(root, 'apps', app, 'vite.config.ts'),

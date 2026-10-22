@@ -5,10 +5,53 @@ export const clashTagSchema = z
   .trim()
   .transform((value) => value.toUpperCase().replace(/^#/, ''))
   .pipe(z.string().regex(/^[A-Z0-9]{3,20}$/, 'Informe uma tag com 3 a 20 letras e números.'));
-export const playerSchema = z.object({ tag: z.string(), name: z.string() }).passthrough();
-export const upcomingChestsSchema = z
-  .object({ items: z.array(z.object({ index: z.number(), name: z.string() }).passthrough()) })
+const statistic = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
+export const cardSchema = z
+  .object({
+    id: statistic,
+    name: z.string().trim().min(1).max(200),
+    level: statistic.optional(),
+    maxLevel: statistic.optional(),
+    iconUrls: z
+      .object({ medium: z.string().max(2000).optional() })
+      .passthrough()
+      .optional(),
+  })
   .passthrough();
+export const playerSchema = z
+  .object({
+    tag: z.string().trim().min(1),
+    name: z.string().trim().min(1).max(200),
+    expLevel: statistic.optional(),
+    trophies: statistic.optional(),
+    bestTrophies: statistic.optional(),
+    wins: statistic.optional(),
+    losses: statistic.optional(),
+    battleCount: statistic.optional(),
+    threeCrownWins: statistic.optional(),
+    totalDonations: statistic.optional(),
+    clan: z
+      .object({ tag: z.string().optional(), name: z.string().min(1) })
+      .passthrough()
+      .nullable()
+      .optional(),
+    arena: z
+      .object({ name: z.string().min(1) })
+      .passthrough()
+      .nullable()
+      .optional(),
+    currentDeck: z.array(cardSchema).max(20).optional(),
+  })
+  .passthrough();
+export const upcomingChestsSchema = z
+  .object({
+    items: z
+      .array(z.object({ index: statistic, name: z.string().trim().min(1).max(200) }).passthrough())
+      .max(1000),
+  })
+  .passthrough();
+export type PlayerCard = z.infer<typeof cardSchema>;
+export type UpcomingChests = z.infer<typeof upcomingChestsSchema>;
 export const tournamentSchema = z
   .object({
     tag: z.string(),
@@ -26,6 +69,7 @@ export const runtimeConfigSchema = z.object({
     portal: remoteUrlSchema,
     auth: remoteUrlSchema,
     competition: remoteUrlSchema,
+    player: remoteUrlSchema,
   }),
 });
 export const apiErrorSchema = z.object({

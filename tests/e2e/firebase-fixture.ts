@@ -16,6 +16,8 @@ export async function mockFirebase(
     profile?: 'current' | 'legacy' | 'none';
     profileDenied?: boolean;
     competitions?: CompetitionFixtureOptions;
+    chests?: 'available' | 'empty';
+    player?: 'full' | 'minimal';
   } = {},
 ) {
   const competition = createCompetitionFixture(options.competitions);
@@ -23,6 +25,9 @@ export async function mockFirebase(
   let verified = options.profile === 'legacy';
   let writes = 0;
   let lookupFailure = false;
+  let chestFailure = false;
+  let playerReads = 0;
+  let chestReads = 0;
   const blocked: string[] = [];
   function jwt() {
     const now = Math.floor(Date.now() / 1000);
@@ -154,13 +159,60 @@ export async function mockFirebase(
     await route.abort();
   });
   await context.route('**/api/player?**', async (route) => {
+    ++playerReads;
     await route.fulfill(
       lookupFailure
         ? { status: 503, json: { error: { code: 'API_NOT_CONFIGURED', message: 'Unavailable' } } }
-        : { json: { tag: '#P0Y', name: 'Jogador de teste' } },
+        : {
+            json: {
+              tag: '#P0Y',
+              name: 'Jogador de teste',
+              ...(options.player === 'minimal'
+                ? {}
+                : {
+                    expLevel: 15,
+                    trophies: 9000,
+                    bestTrophies: 9100,
+                    wins: 100,
+                    losses: 0,
+                    battleCount: 100,
+                    threeCrownWins: 25,
+                    totalDonations: 2000,
+                    clan: { tag: '#ABC', name: 'Clã da comunidade' },
+                    arena: { name: 'Arena lendária' },
+                    currentDeck: [
+                      { id: 1, name: 'Arqueiras' },
+                      { id: 2, name: 'Gigante', iconUrls: { medium: 'javascript:alert(1)' } },
+                    ],
+                  }),
+            },
+          },
+    );
+  });
+  await context.route('**/api/upcomingchests?**', async (route) => {
+    ++chestReads;
+    await route.fulfill(
+      chestFailure
+        ? { status: 503, json: { error: { code: 'API_NOT_CONFIGURED', message: 'Unavailable' } } }
+        : {
+            json: {
+              items:
+                options.chests === 'empty'
+                  ? []
+                  : [
+                      { index: 2, name: 'Gold Chest' },
+                      { index: 0, name: 'Silver Chest' },
+                    ],
+            },
+          },
     );
   });
   return {
+    getPlayerReads: () => playerReads,
+    getChestReads: () => chestReads,
+    failChestLookup: (fail: boolean) => {
+      chestFailure = fail;
+    },
     competition,
     getWrites: () => writes,
     getBlocked: () => blocked,

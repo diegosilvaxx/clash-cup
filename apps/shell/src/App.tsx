@@ -6,18 +6,17 @@ import { RemoteSlot } from './RemoteSlot';
 export function App() {
   const state = useSession();
   const { pathname } = useLocation();
-  const remote = matchPath('/', pathname)
-    ? 'portal'
-    : ['/entrar', '/cadastro', '/vincular-jogador', '/minha-conta'].some((path) =>
-          matchPath(path, pathname),
-        )
-      ? 'auth'
-      : ['/torneios', '/torneios/:id', '/meus-torneios'].some((path) => matchPath(path, pathname))
-        ? 'competition'
-        : null;
+  const remotes = [
+    { name: 'portal', paths: ['/'] },
+    { name: 'auth', paths: ['/entrar', '/cadastro', '/vincular-jogador', '/minha-conta'] },
+    { name: 'competition', paths: ['/torneios', '/torneios/:id', '/meus-torneios'] },
+    { name: 'player', paths: ['/perfil', '/baus', '/area-vip'] },
+  ] as const;
+  const remote = remotes.find(({ paths }) => paths.some((path) => matchPath(path, pathname)))?.name;
   return (
     <PageLayout
       competitionNavigation
+      playerNavigation
       accountMenu={
         <AccountMenu
           key={state.user?.uid ?? 'anonymous'}

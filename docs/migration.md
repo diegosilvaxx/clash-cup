@@ -16,15 +16,15 @@ O site PHP consulta tabelas MySQL, enquanto a aplicação React consulta Firesto
 
 ## Divisão planejada
 
-| Aplicação     | Escopo                                                                  | Situação                                              |
-| ------------- | ----------------------------------------------------------------------- | ----------------------------------------------------- |
-| `shell`       | Layout, navegação, rotas, carregamento e recuperação dos remotos        | Base implementada                                     |
-| `portal`      | Conteúdo público: apresentação, regras, contato, apoiadores e políticas | Apresentação inicial implementada                     |
-| `auth`        | Login, cadastro, saída e vínculo inicial com jogador                    | Base implementada                                     |
-| `competition` | Torneios, inscrições, meus torneios e ranking                           | Torneios e inscrições implementados; ranking pendente |
-| `player`      | Perfil, baús, área VIP, loja e emblemas                                 | Planejada                                             |
-| `admin`       | Administração de torneios, ranking e permissões                         | Planejada                                             |
-| `api`         | Adaptador para a API oficial e futuras operações de negócio autorizadas | Adaptador inicial implementado                        |
+| Aplicação     | Escopo                                                                  | Situação                                                    |
+| ------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `shell`       | Layout, navegação, rotas, carregamento e recuperação dos remotos        | Base implementada                                           |
+| `portal`      | Conteúdo público: apresentação, regras, contato, apoiadores e políticas | Apresentação inicial implementada                           |
+| `auth`        | Login, cadastro, saída e vínculo inicial com jogador                    | Base implementada                                           |
+| `competition` | Torneios, inscrições, meus torneios e ranking                           | Torneios e inscrições implementados; ranking pendente       |
+| `player`      | Perfil, baús, área VIP, loja e emblemas                                 | Perfil, baús e VIP informativo implementados; loja pendente |
+| `admin`       | Administração de torneios, ranking e permissões                         | Planejada                                                   |
+| `api`         | Adaptador para a API oficial e futuras operações de negócio autorizadas | Adaptador inicial implementado                              |
 
 Os limites seguem responsabilidades de produto. A API é backend; ela não é um microfrontend. Os pacotes compartilhados devem conter contratos, infraestrutura e elementos reutilizáveis, evitando importar telas ou regras de uma aplicação diretamente em outra.
 
@@ -34,9 +34,9 @@ flowchart LR
   Shell --> Auth
   Auth --> API
   Shell --> Competition
-  Shell -.-> Player
+  Shell --> Player
   Shell -.-> Admin
-  Player -.-> API
+  Player --> API
   Competition -.-> API
   Admin -.-> API
   API --> ClashRoyale[API oficial Clash Royale]
@@ -49,7 +49,7 @@ As ligações tracejadas representam integrações ainda não implementadas.
 1. **Fundação:** npm workspaces, TypeScript, React, styled-components, Module Federation, shell, apresentação pública inicial, API com Axios/Zod e testes da integração. Sem credenciais copiadas do legado.
 2. **Autenticação:** pacote compartilhado para sessão Firebase, estados de carregamento, Google, cadastro e vínculo da tag. Adicionar o remoto `auth`, rotas acessíveis por URL e testes com ambiente de desenvolvimento isolado. Google e email/senha foram mantidos. Detalhes em [Autenticação](authentication.md).
 3. **Competições (implementada):** remoto `competition`, listas de torneios, detalhes, inscrições e meus torneios. Preservar campos e identificadores existentes; controlar concorrência de vagas com operações atômicas. Revisar dados MySQL/Firestore antes de qualquer importação. Inscrições antigas permanecem somente leitura até revisão dos identificadores; detalhes e regras em [Competições](competitions.md).
-4. **Área do jogador:** remoto `player`, perfil, baús e área VIP. Integrar a API pelo mesmo domínio e cancelar consultas substituídas. Adicionar cache somente onde a política de validade estiver definida.
+4. **Área do jogador (implementada):** remoto `player`, perfil, baús e área VIP. Integrar a API pelo mesmo domínio e cancelar consultas substituídas. Consultas ao abrir e ao atualizar, sem cache próprio nesta etapa. A área VIP preserva o conteúdo informativo do legado; assinaturas e benefícios dependem de integração futura. Veja [Área do jogador](player.md).
 5. **Loja e ranking:** saldo, emblemas, histórico e ranking. Validar saldo e propriedade no backend/regras do banco; transferências e débitos precisam ser atômicos. Importações de resultados devem ser idempotentes para evitar pontuação duplicada.
 6. **Administração:** remoto `admin`, gestão de torneios, ranking e administradores. Validar identidade e permissões nas operações de dados; ocultar menus no frontend não concede nem revoga autorização. Remover o fallback por email fixo presente no legado.
 7. **Conteúdo público e acabamento:** migrar regras, políticas, contato e apoiadores; confirmar os destinos atuais dos links; revisar responsividade, acessibilidade e identidade visual. Formulários só devem aparecer como funcionais quando houver tratamento de envio.

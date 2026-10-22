@@ -8,10 +8,12 @@ export function PageLayout({
   children,
   accountMenu,
   competitionNavigation = false,
+  playerNavigation = false,
 }: {
   children: ReactNode;
   accountMenu?: ReactNode;
   competitionNavigation?: boolean;
+  playerNavigation?: boolean;
 }) {
   return (
     <Frame>
@@ -31,6 +33,7 @@ export function PageLayout({
                 <Link to="/meus-torneios">Meus torneios</Link>
               </>
             )}
+            {playerNavigation && <Link to="/perfil">Área do jogador</Link>}
             {accountMenu}
           </nav>
         </HeaderContent>

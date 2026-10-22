@@ -1,4 +1,4 @@
-import { AxiosError, AxiosHeaders, type AxiosInstance } from 'axios';
+import { AxiosError, AxiosHeaders, CanceledError, type AxiosInstance } from 'axios';
 import { describe, expect, it, vi } from 'vitest';
 import { createClashService } from './clash-client';
 
@@ -7,6 +7,16 @@ function mockClient() {
   return { get, http: { get } as unknown as AxiosInstance };
 }
 describe('Clash Royale adapter', () => {
+  it('forwards cancellation to the upstream client without rewriting it as a server error', async () => {
+    const { get, http } = mockClient();
+    const signal = new AbortController().signal;
+    const cancelled = new CanceledError('cancelled');
+    get.mockRejectedValue(cancelled);
+    await expect(createClashService('test-token', http).player('P0Y', signal)).rejects.toBe(
+      cancelled,
+    );
+    expect(get).toHaveBeenCalledWith('/players/%23P0Y', { signal });
+  });
   it('encodes the tag and validates successful upstream data', async () => {
     const { get, http } = mockClient();
     get.mockResolvedValue({ data: { tag: '#P0Y', name: 'Player', trophies: 9000 } });

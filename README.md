@@ -35,6 +35,7 @@ npm run dev
 | Portal independente       | <http://127.0.0.1:5301>            |
 | Autenticação independente | <http://127.0.0.1:5302/entrar>     |
 | Competições independente  | <http://127.0.0.1:5303/torneios>   |
+| Jogador independente      | <http://127.0.0.1:5304>            |
 | Saúde da API              | <http://127.0.0.1:5400/api/health> |
 
 Use `127.0.0.1` nos endereços. Para encerrar os serviços, pressione `Ctrl+C` no terminal que executa o projeto.
@@ -60,6 +61,10 @@ npm run dev:competition
 ```
 
 ```powershell
+npm run dev:player
+```
+
+```powershell
 npm run dev:shell
 ```
 
@@ -68,6 +73,8 @@ O shell depende do portal para exibir a página inicial. Se o portal estiver par
 As telas de conta dependem do remoto `auth`. Shell e remoto compartilham a sessão no portal integrado; aplicações em portas diferentes mantêm sessões independentes.
 
 As rotas de torneios usam o remoto `competition`. Veja [torneios e inscrições](docs/competitions.md) para dados, regras e compatibilidade com inscrições antigas.
+
+A [área do jogador](docs/player.md) oferece perfil e próximos baús pelo BFF, além da página informativa de apoio VIP.
 
 ### Build e prévia
 
@@ -89,6 +96,7 @@ apps/
   portal/       Primeiro microfrontend: apresentação pública
   auth/         Login, cadastro, vínculo e conta
   competition/  Torneios e inscrições
+  player/       Perfil, próximos baús e informações VIP
   api/          Integração com a API oficial do Clash Royale
 packages/
   contracts/    Contratos e validação em execução
@@ -123,7 +131,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
+Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, perfil, baús, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
 
 ## API
 
@@ -136,11 +144,19 @@ Os caminhos da integração anterior foram mantidos:
 | GET    | `/api/upcomingchests` | `idclash` |
 | GET    | `/api/tournaments`    | `tag`     |
 
+Para criar a chave no portal Clash Royale, informe em **Allowed IP Addresses** o IPv4 público da conexão em que o BFF será executado. No PowerShell desse computador, consulte-o com:
+
+```powershell
+Invoke-RestMethod 'https://api.ipify.org'
+```
+
+`127.0.0.1`, `localhost` e endereços privados da rede não são aceitos nesse cadastro. O portal continua sendo acessado localmente em `127.0.0.1`; a API externa identifica o IP público de saída. Copie o token gerado para `CLASH_ROYALE_API_TOKEN` no `.env` e reinicie `npm run dev`. Se o IP público mudar, gere uma chave para o novo IP.
+
 As tags aceitam letras e números, com `#` inicial opcional. A tag é normalizada e codificada antes da consulta externa. O cliente deve codificar `#` como `%23` ao montar a query string. O token existe somente no servidor e os erros não expõem a configuração da requisição.
 
 ## Migração
 
-Estão implementadas a fundação, a autenticação e a **etapa 3 de competições**: lista e detalhes de torneios, novas inscrições e cancelamentos por transação, Meus torneios e consulta das inscrições antigas. Ranking, perfil completo, loja e administração serão migrados nas próximas etapas. Não há importação automática de dados anteriores.
+Estão implementadas as etapas 1 a 4: fundação, autenticação, competições e área do jogador. Ranking, loja e administração serão migrados nas próximas etapas. Não há importação automática de dados anteriores.
 
 As [regras de competições](docs/competitions.md#aplicar-as-regras) alteram as permissões do fluxo antigo de torneios. Revise a transição antes de publicá-las no Firebase compartilhado.
 

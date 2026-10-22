@@ -32,6 +32,39 @@ afterEach(async () => {
 });
 
 describe('API routes', () => {
+  it('cancels the upstream operation when the browser disconnects', async () => {
+    const service = mockService();
+    let started!: () => void;
+    let cancelled!: () => void;
+    const ready = new Promise<void>((resolve) => {
+      started = resolve;
+    });
+    const aborted = new Promise<void>((resolve) => {
+      cancelled = resolve;
+    });
+    service.player.mockImplementation(
+      (_tag: string, signal: AbortSignal) =>
+        new Promise((resolve) => {
+          signal.addEventListener(
+            'abort',
+            () => {
+              cancelled();
+              resolve({ tag: '#P0Y', name: 'Player' });
+            },
+            { once: true },
+          );
+          started();
+        }),
+    );
+    const http = await start(service);
+    const controller = new AbortController();
+    const request = http.get('/api/player?idclash=P0Y', { signal: controller.signal });
+    const rejected = expect(request).rejects.toMatchObject({ code: 'ERR_CANCELED' });
+    await ready;
+    controller.abort();
+    await rejected;
+    await aborted;
+  });
   it('starts without credentials and exposes health without querying upstream', async () => {
     const http = await start(createClashService(undefined));
     expect((await http.get('/api/health')).data).toEqual({
@@ -59,7 +92,7 @@ describe('API routes', () => {
   ] as const)('preserves the legacy route and normalizes the tag: %s', async (path, method) => {
     const service = mockService();
     expect((await (await start(service)).get(path)).status).toBe(200);
-    expect(service[method]).toHaveBeenCalledWith('P0Y');
+    expect(service[method]).toHaveBeenCalledWith('P0Y', expect.any(AbortSignal));
   });
   it('uses an explicit method policy and returns 404 for unknown routes', async () => {
     const http = await start(mockService());

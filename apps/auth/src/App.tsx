@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Link, Navigate, Route, Routes } from 'react-router-dom';
 import { session, useSession } from '@clash-cup/session';
 import { Container, Notice } from '@clash-cup/ui';
 import { CredentialsForm } from './CredentialsForm';
@@ -96,6 +96,9 @@ export function App() {
                   <dt>Email</dt>
                   <dd>{state.user?.email ?? 'Não informado'}</dd>
                 </DefinitionList>
+                <p>
+                  <Link to="/perfil">Ver perfil do jogo</Link>
+                </p>
               </Card>
             )
           }

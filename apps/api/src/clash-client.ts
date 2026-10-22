@@ -4,9 +4,9 @@ import { playerSchema, tournamentSchema, upcomingChestsSchema } from '@clash-cup
 import { ApiError } from './errors';
 
 export interface ClashService {
-  player(tag: string): Promise<unknown>;
-  upcomingChests(tag: string): Promise<unknown>;
-  tournament(tag: string): Promise<unknown>;
+  player(tag: string, signal?: AbortSignal): Promise<unknown>;
+  upcomingChests(tag: string, signal?: AbortSignal): Promise<unknown>;
+  tournament(tag: string, signal?: AbortSignal): Promise<unknown>;
 }
 
 export function createClashService(
@@ -21,7 +21,7 @@ export function createClashService(
       maxRedirects: 0,
       headers: { Accept: 'application/json', Authorization: token ? `Bearer ${token}` : '' },
     });
-  async function request(path: string, schema: z.ZodType) {
+  async function request(path: string, schema: z.ZodType, signal?: AbortSignal) {
     if (!token?.trim())
       throw new ApiError(
         503,
@@ -29,9 +29,12 @@ export function createClashService(
         'A integração com Clash Royale ainda não foi configurada.',
       );
     try {
-      const response = await http.get<unknown>(path);
+      const response = signal
+        ? await http.get<unknown>(path, { signal })
+        : await http.get<unknown>(path);
       return schema.parse(response.data);
     } catch (error) {
+      if (axios.isCancel(error)) throw error;
       if (error instanceof z.ZodError)
         throw new ApiError(502, 'INVALID_UPSTREAM_RESPONSE', 'A API retornou dados inválidos.');
       if (axios.isAxiosError(error)) {
@@ -54,9 +57,15 @@ export function createClashService(
     }
   }
   return {
-    player: (tag) => request(`/players/${encodeURIComponent(`#${tag}`)}`, playerSchema),
-    upcomingChests: (tag) =>
-      request(`/players/${encodeURIComponent(`#${tag}`)}/upcomingchests`, upcomingChestsSchema),
-    tournament: (tag) => request(`/tournaments/${encodeURIComponent(`#${tag}`)}`, tournamentSchema),
+    player: (tag, signal) =>
+      request(`/players/${encodeURIComponent(`#${tag}`)}`, playerSchema, signal),
+    upcomingChests: (tag, signal) =>
+      request(
+        `/players/${encodeURIComponent(`#${tag}`)}/upcomingchests`,
+        upcomingChestsSchema,
+        signal,
+      ),
+    tournament: (tag, signal) =>
+      request(`/tournaments/${encodeURIComponent(`#${tag}`)}`, tournamentSchema, signal),
   };
 }

@@ -39,7 +39,14 @@ export function RemoteSlot({ name = 'portal' }: { name?: RemoteName }) {
     <RemoteBoundary
       key={attempt}
       retry={retry}
-      label={{ portal: 'o portal', auth: 'o acesso à conta', competition: 'os torneios' }[name]}
+      label={
+        {
+          portal: 'o portal',
+          auth: 'o acesso à conta',
+          competition: 'os torneios',
+          player: 'a área do jogador',
+        }[name]
+      }
     >
       <Suspense
         fallback={
