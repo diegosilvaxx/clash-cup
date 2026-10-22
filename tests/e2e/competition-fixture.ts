@@ -4,6 +4,7 @@ type Value = {
   stringValue?: string;
   integerValue?: string;
   timestampValue?: string;
+  arrayValue?: { values?: Value[] };
   mapValue?: { fields: Record<string, Value> };
 };
 type RecordData = Record<string, Value>;
@@ -16,7 +17,14 @@ type Write = {
   updateTransforms?: { fieldPath: string; setToServerValue: string }[];
   currentDocument?: { exists?: boolean; updateTime?: string };
 };
+export type RewardFixtureOptions = {
+  wallet?: 'claimed' | 'unclaimed' | 'missing';
+  gold?: number;
+  owned?: string[];
+  ranking?: 'available' | 'empty';
+};
 export type CompetitionFixtureOptions = {
+  rewards?: RewardFixtureOptions;
   empty?: boolean;
   full?: boolean;
   legacy?: boolean;
@@ -30,6 +38,7 @@ export function createCompetitionFixture(options: CompetitionFixtureOptions = {}
   let denied = false;
   let failCommit = false;
   let conflict = false;
+  let shopConflict = false;
   let commits = 0;
   function time() {
     return (
@@ -63,6 +72,40 @@ export function createCompetitionFixture(options: CompetitionFixtureOptions = {}
         idUser: str('player@example.test'),
         registeredAt: str('2026-10-12'),
       });
+  }
+  if (options.rewards) {
+    const reward = options.rewards;
+    if (reward.wallet !== 'missing')
+      seed('shop/#P0Y', {
+        idClashRoyale: str('#P0Y'),
+        ...(reward.wallet !== 'unclaimed' ? { ownerUid: str('fixture-user') } : {}),
+        gold: { integerValue: String(reward.gold ?? 10) },
+        emotesBuy: { arrayValue: { values: (reward.owned ?? []).map(str) } },
+        use: str(''),
+      });
+    if (reward.ranking !== 'empty') {
+      seed('ranking/#P0Y', {
+        tag: str('#P0Y'),
+        name: str('Jogador de teste'),
+        score: { integerValue: '0' },
+      });
+      seed('ranking/#AAA', {
+        tag: str('#AAA'),
+        name: str('Líder da comunidade'),
+        score: { integerValue: '20' },
+      });
+      for (const [month, score] of [
+        [1, 3],
+        [2, 2],
+      ])
+        seed(`rankingHistory/#P0Y_${month}_2026`, {
+          tag: str('#P0Y'),
+          name: str('Jogador de teste'),
+          score: { integerValue: String(score) },
+          month: { integerValue: String(month) },
+          year: { integerValue: '2026' },
+        });
+    }
   }
   async function handle(
     route: Route,
@@ -129,6 +172,13 @@ export function createCompetitionFixture(options: CompetitionFixtureOptions = {}
       tournament.fields.vacanciesAvailable = { integerValue: '2' };
       tournament.updateTime = time();
     }
+    if (shopConflict) {
+      shopConflict = false;
+      const wallet = documents.get(base + 'shop/#P0Y')!;
+      wallet.fields.gold = { integerValue: '5' };
+      wallet.fields.emotesBuy = { arrayValue: { values: [str('blow')] } };
+      wallet.updateTime = time();
+    }
     const invalid = writes.some((write) => {
       const existing = documents.get(write.update?.name ?? write.delete ?? write.verify ?? '');
       return (
@@ -188,6 +238,14 @@ export function createCompetitionFixture(options: CompetitionFixtureOptions = {}
     fillDuringCommit: () => {
       conflict = true;
     },
+    spendDuringShopCommit: () => {
+      shopConflict = true;
+    },
+    getGold: () => Number(documents.get(base + 'shop/#P0Y')?.fields.gold?.integerValue),
+    getOwned: () =>
+      documents
+        .get(base + 'shop/#P0Y')
+        ?.fields.emotesBuy?.arrayValue?.values?.map((value) => value.stringValue) ?? [],
     getCommits: () => commits,
     getOccupied: () => {
       const value = documents.get(base + 'tournament/cup')?.fields.vacanciesAvailable;

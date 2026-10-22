@@ -84,3 +84,25 @@ export const Button = styled.button`
     cursor: default;
   }
 `;
+
+export const EmblemGrid = styled.ul`
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 18px;
+  margin-top: 24px;
+  li {
+    padding: 20px;
+    border: 1px solid #dbe2ee;
+    border-radius: 16px;
+    background: white;
+    text-align: center;
+  }
+  img {
+    object-fit: contain;
+  }
+  h2 {
+    font-size: 18px;
+  }
+`;

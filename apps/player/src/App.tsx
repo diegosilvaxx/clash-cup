@@ -4,6 +4,7 @@ import { session, useSession, type PlayerProfile } from '@clash-cup/session';
 import { Container } from '@clash-cup/ui';
 import { Chests } from './Chests';
 import { Profile } from './Profile';
+import { Shop } from './Shop';
 import { Vip } from './Vip';
 import { Button, Navigation, Panel } from './styles';
 
@@ -39,6 +40,8 @@ export function App() {
       <Navigation aria-label="Área do jogador">
         <NavLink to="/perfil">Perfil</NavLink>
         <NavLink to="/baus">Baús</NavLink>
+        <NavLink to="/loja">Loja</NavLink>
+        <NavLink to="/meus-emblemas">Meus emblemas</NavLink>
         <NavLink to="/area-vip">Área VIP</NavLink>
       </Navigation>
       <Routes>
@@ -62,6 +65,19 @@ export function App() {
             </LinkedPlayer>
           }
         />
+        {['/loja', '/meus-emblemas'].map((path) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              <LinkedPlayer>
+                {(profile) => (
+                  <Shop key={`${profile.uid}:${profile.idClashRoyale}`} profile={profile} />
+                )}
+              </LinkedPlayer>
+            }
+          />
+        ))}
         <Route path="/area-vip" element={<Vip />} />
         <Route path="*" element={<Navigate replace to="/perfil" />} />
       </Routes>

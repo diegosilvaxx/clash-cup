@@ -1,0 +1,90 @@
+[
+  { "id": "angry", "name": "Princesa zangada", "price": 10, "image": "emote_princess_angry.png" },
+  {
+    "id": "basketball",
+    "name": "Lançador de basquete",
+    "price": 25,
+    "image": "emote_bowler_basketball.png"
+  },
+  { "id": "blow", "name": "Mosqueteira", "price": 5, "image": "emote_musketeer_blow.png" },
+  {
+    "id": "christmas",
+    "name": "Porquinho de Natal",
+    "price": 25,
+    "image": "emote_royal_hog_christmas_01.png"
+  },
+  { "id": "fight", "name": "Gigante lutador", "price": 8, "image": "emote_giant_fight.png" },
+  {
+    "id": "giant",
+    "name": "Gigante elétrico",
+    "price": 15,
+    "image": "emote_electro_giant_confused.png"
+  },
+  {
+    "id": "menacing",
+    "name": "Rainha arqueira",
+    "price": 30,
+    "image": "emote_archer_queen_menacing.png"
+  },
+  { "id": "pirate", "name": "Rei pirata", "price": 20, "image": "emote_king_pirate.png" },
+  { "id": "trophy", "name": "Goblin com troféu", "price": 40, "image": "emote_goblin_trophy.png" },
+  { "id": "goblin", "name": "Goblin CRL", "price": 50, "image": "emote_goblin_crl_2019.png" },
+  {
+    "id": "juggling",
+    "name": "Goblin malabarista",
+    "price": 0,
+    "image": "emote_goblin_juggling.png"
+  },
+  {
+    "id": "lumberjack",
+    "name": "Lenhador",
+    "price": 11,
+    "image": "emote_lumberjack_allseeing.png"
+  },
+  { "id": "monk_arrow", "name": "Monge", "price": 35, "image": "emote_monk_arrow.png" },
+  {
+    "id": "king10points",
+    "name": "Rei nota dez",
+    "price": 40,
+    "image": "emote_king_10_points.png"
+  },
+  {
+    "id": "goldenknight",
+    "name": "Cavaleiro dourado",
+    "price": 35,
+    "image": "emote_golden_knight_fail.png"
+  },
+  { "id": "megaknight", "name": "Megacavaleiro", "price": 15, "image": "emote_mega_knight.png" },
+  {
+    "id": "pekkacoconut",
+    "name": "Mini P.E.K.K.A",
+    "price": 25,
+    "image": "emote_mini_pekka_coconut.png"
+  },
+  {
+    "id": "bootydance",
+    "name": "Dança do porquinho",
+    "price": 8,
+    "image": "emote_royal_hog_booty_dance.png"
+  },
+  {
+    "id": "gobarian",
+    "name": "Goblin bárbaro",
+    "price": 28,
+    "image": "emote_goblin_gob_arian.png"
+  },
+  {
+    "id": "barbarianbttf",
+    "name": "Bárbaro do futuro",
+    "price": 15,
+    "image": "emote_barbarian_bttf.png"
+  },
+  { "id": "kingnr1", "name": "Rei número um", "price": 150, "image": "emote_king_nr1.png" },
+  {
+    "id": "kingbelt",
+    "name": "Rei campeão",
+    "price": 999,
+    "image": "emote_king_belt.png",
+    "event": true
+  }
+]

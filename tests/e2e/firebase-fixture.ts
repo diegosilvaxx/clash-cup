@@ -1,5 +1,9 @@
 import type { BrowserContext } from '@playwright/test';
-import { createCompetitionFixture, type CompetitionFixtureOptions } from './competition-fixture';
+import {
+  createCompetitionFixture,
+  type CompetitionFixtureOptions,
+  type RewardFixtureOptions,
+} from './competition-fixture';
 
 const uid = 'fixture-user';
 const email = 'player@example.test';
@@ -18,9 +22,13 @@ export async function mockFirebase(
     competitions?: CompetitionFixtureOptions;
     chests?: 'available' | 'empty';
     player?: 'full' | 'minimal';
+    rewards?: RewardFixtureOptions;
   } = {},
 ) {
-  const competition = createCompetitionFixture(options.competitions);
+  const competition = createCompetitionFixture({
+    ...options.competitions,
+    ...(options.rewards ? { rewards: options.rewards } : {}),
+  });
   let current = options.profile === 'current' ? profileFields : null;
   let verified = options.profile === 'legacy';
   let writes = 0;

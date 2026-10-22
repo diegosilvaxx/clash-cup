@@ -74,7 +74,7 @@ As telas de conta dependem do remoto `auth`. Shell e remoto compartilham a sess�
 
 As rotas de torneios usam o remoto `competition`. Veja [torneios e inscrições](docs/competitions.md) para dados, regras e compatibilidade com inscrições antigas.
 
-A [área do jogador](docs/player.md) oferece perfil e próximos baús pelo BFF, além da página informativa de apoio VIP.
+A [área do jogador](docs/player.md) oferece perfil e próximos baús pelo BFF, além da página informativa de apoio VIP. A [loja e o ranking](docs/rewards.md) adicionam saldo, coleção de emblemas e consulta ao histórico. Para comprar, o saldo precisa estar associado à conta pela organização e as regras desta etapa precisam estar publicadas.
 
 ### Build e prévia
 
@@ -95,8 +95,8 @@ apps/
   shell/        Navegação e carregamento dos microfrontends
   portal/       Primeiro microfrontend: apresentação pública
   auth/         Login, cadastro, vínculo e conta
-  competition/  Torneios e inscrições
-  player/       Perfil, próximos baús e informações VIP
+  competition/  Torneios, inscrições e ranking
+  player/       Perfil, baús, VIP, loja e emblemas
   api/          Integração com a API oficial do Clash Royale
 packages/
   contracts/    Contratos e validação em execução
@@ -104,6 +104,7 @@ packages/
   session/      Sessão Firebase e vínculo do jogador
   firebase/     Aplicação Firebase e SDKs compartilhados
   competitions/ Acesso aos torneios e transações de inscrição
+  rewards/      Catálogo, compras atômicas e ranking
   ui/           Componentes e estilos compartilhados
 tooling/        Configuração de build e aliases
 scripts/        Inicialização e verificação de arquitetura
@@ -131,7 +132,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, perfil, baús, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
+Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, perfil, baús, loja, emblemas, ranking, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
 
 ## API
 
@@ -156,9 +157,9 @@ As tags aceitam letras e números, com `#` inicial opcional. A tag é normalizad
 
 ## Migração
 
-Estão implementadas as etapas 1 a 4: fundação, autenticação, competições e área do jogador. Ranking, loja e administração serão migrados nas próximas etapas. Não há importação automática de dados anteriores.
+Estão implementadas as etapas 1 a 5: fundação, autenticação, competições, área do jogador, loja e ranking. Administração e importação de resultados ficam para a próxima etapa. Não há importação automática de dados anteriores.
 
-As [regras de competições](docs/competitions.md#aplicar-as-regras) alteram as permissões do fluxo antigo de torneios. Revise a transição antes de publicá-las no Firebase compartilhado.
+As [regras de competições](docs/competitions.md#aplicar-as-regras) alteram as permissões do fluxo antigo de torneios. As [regras de loja e ranking](docs/rewards.md#aplicar-as-regras) também restringem as gravações antigas e exigem associação do saldo ao UID. Revise a transição e valide as regras em uma base de teste antes de publicá-las no Firebase compartilhado.
 
 Veja o [levantamento das funcionalidades e as próximas etapas](docs/migration.md). Os três projetos originais permanecem como referência, sem alteração dos serviços e dados existentes.
 

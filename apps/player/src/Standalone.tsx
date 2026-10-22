@@ -14,7 +14,7 @@ export function Standalone() {
               <Container>
                 <h1>Acesse sua conta pelo portal</h1>
                 <p>
-                  Para consultar seu perfil e seus próximos baús,{' '}
+                  Para consultar seu perfil, seus baús e seus emblemas,{' '}
                   <a href={`http://127.0.0.1:5300${path}`}>continue no portal integrado</a>.
                 </p>
               </Container>

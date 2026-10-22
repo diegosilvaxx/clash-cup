@@ -10,6 +10,7 @@
   "dependencies": {
     "@clash-cup/competitions": "0.1.0",
     "@clash-cup/session": "0.1.0",
-    "@clash-cup/ui": "0.1.0"
+    "@clash-cup/ui": "0.1.0",
+    "@clash-cup/rewards": "0.1.0"
   }
 }

@@ -24,8 +24,10 @@
       "@clash-cup/ui": ["./packages/ui/src/index.tsx"],
       "@clash-cup/session": ["./packages/session/src/index.ts"],
       "@clash-cup/firebase": ["./packages/firebase/src/index.ts"],
-      "@clash-cup/competitions": ["./packages/competitions/src/index.ts"]
-    }
+      "@clash-cup/competitions": ["./packages/competitions/src/index.ts"],
+      "@clash-cup/rewards": ["./packages/rewards/src/index.ts"]
+    },
+    "resolveJsonModule": true
   },
   "include": ["apps", "packages", "tooling", "tests", "*.config.ts"]
 }

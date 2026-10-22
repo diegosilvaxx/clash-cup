@@ -8,6 +8,7 @@ import {
   type Registration,
 } from '@clash-cup/competitions';
 import { Container } from '@clash-cup/ui';
+import { Ranking } from './Ranking';
 import { useCompetitionData } from './useCompetitionData';
 import { Actions, Button, Card, Feedback, Grid, Navigation } from './styles';
 
@@ -281,5 +282,6 @@ function CompetitionContent() {
   );
 }
 export function App() {
-  return <CompetitionContent />;
+  const { pathname } = useLocation();
+  return pathname === '/ranking' ? <Ranking /> : <CompetitionContent />;
 }

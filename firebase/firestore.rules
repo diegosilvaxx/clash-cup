@@ -5,7 +5,7 @@ service cloud.firestore {
     // Collections not yet migrated keep their legacy policy.
     match /{collection}/{document=**} {
       allow read, write: if request.auth != null
-        && !(collection in ['playerProfiles', 'tournament', 'myTournament', 'competitionRegistrations']);
+        && !(collection in ['playerProfiles', 'tournament', 'myTournament', 'competitionRegistrations', 'shop', 'ranking', 'rankingHistory']);
     }
 
     match /playerProfiles/{uid} {
@@ -106,8 +106,60 @@ service cloud.firestore {
       // Historical registrations need an unambiguous canonical mapping before any mutation.
       allow write: if false;
     }
-    match /shop/{document} { allow read: if true; }
-    match /ranking/{document} { allow read: if true; }
-    match /rankingHistory/{document} { allow read: if true; }
+    // BEGIN GENERATED SHOP PRICES
+    function emblemPrice(id) {
+      return id == 'angry' ? 10
+        : id == 'basketball' ? 25
+        : id == 'blow' ? 5
+        : id == 'christmas' ? 25
+        : id == 'fight' ? 8
+        : id == 'giant' ? 15
+        : id == 'menacing' ? 30
+        : id == 'pirate' ? 20
+        : id == 'trophy' ? 40
+        : id == 'goblin' ? 50
+        : id == 'juggling' ? 0
+        : id == 'lumberjack' ? 11
+        : id == 'monk_arrow' ? 35
+        : id == 'king10points' ? 40
+        : id == 'goldenknight' ? 35
+        : id == 'megaknight' ? 15
+        : id == 'pekkacoconut' ? 25
+        : id == 'bootydance' ? 8
+        : id == 'gobarian' ? 28
+        : id == 'barbarianbttf' ? 15
+        : id == 'kingnr1' ? 150
+        : -1;
+    }
+    // END GENERATED SHOP PRICES
+    match /shop/{document} {
+      function validChange() {
+        let before = resource.data;
+        let after = request.resource.data;
+        let owned = before.get('emotesBuy', []);
+        let balance = before.get('gold', 0);
+        let price = emblemPrice(after.use);
+        return before.get('ownerUid', '') == request.auth.uid
+          && linkedTag(before.idClashRoyale)
+          && after.diff(before).affectedKeys().hasOnly(['gold', 'emotesBuy', 'use', 'lastUpdated'])
+          && balance is int && balance >= 0 && balance <= 9007199254740991
+          && owned is list && owned.size() <= 100
+          && after.gold is int && after.gold >= 0
+          && after.lastUpdated == request.time
+          && (price >= 0 || after.use == 'kingbelt')
+          && (
+            (after.use in owned && after.emotesBuy == owned && after.gold == balance)
+            || (!(after.use in owned) && price >= 0 && owned.size() < 100
+              && after.emotesBuy == owned.concat([after.use])
+              && after.gold == balance - price)
+          );
+      }
+      // Legacy ranking already exposes equipped emblems through these public documents.
+      allow read: if true;
+      allow create, delete: if admin();
+      allow update: if admin() || (request.auth != null && validChange());
+    }
+    match /ranking/{document} { allow read: if true; allow write: if admin(); }
+    match /rankingHistory/{document} { allow read: if true; allow write: if admin(); }
   }
 }

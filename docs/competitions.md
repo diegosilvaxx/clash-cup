@@ -72,7 +72,7 @@ As regras exigem:
 - Jogador vinculado para nova inscrição e horário atribuído pelo servidor.
 - Escrita de inscrições antigas negada.
 
-A gestão de torneios fica reservada à custom claim `admin: true`, concedida por ambiente confiável; nenhuma tela desta etapa concede esse papel. Enquanto o painel novo não é migrado, o console Firebase pode administrar os torneios. As demais coleções antigas conservam sua política anterior e ainda precisam de revisão nas respectivas etapas.
+A gestão de torneios fica reservada à custom claim `admin: true`, concedida por ambiente confiável; nenhuma tela desta etapa concede esse papel. Enquanto o painel novo não é migrado, o console Firebase pode administrar os torneios. As coleções `shop`, `ranking` e `rankingHistory` também possuem regras específicas, descritas em [Loja, emblemas e ranking](rewards.md). As demais coleções antigas conservam sua política de transição e ainda precisam de revisão nas respectivas etapas.
 
 ## Conferência
 

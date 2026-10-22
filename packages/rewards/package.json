@@ -1,0 +1,13 @@
+{
+  "name": "@clash-cup/rewards",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@clash-cup/contracts": "0.1.0",
+    "@clash-cup/firebase": "0.1.0",
+    "@clash-cup/session": "0.1.0",
+    "zod": "4.6.5"
+  }
+}

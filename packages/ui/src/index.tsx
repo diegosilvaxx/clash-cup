@@ -30,6 +30,7 @@ export function PageLayout({
             {competitionNavigation && (
               <>
                 <Link to="/torneios">Torneios</Link>
+                <Link to="/ranking">Ranking</Link>
                 <Link to="/meus-torneios">Meus torneios</Link>
               </>
             )}
