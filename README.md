@@ -34,6 +34,7 @@ npm run dev
 | Shell integrado           | <http://127.0.0.1:5300>            |
 | Portal independente       | <http://127.0.0.1:5301>            |
 | Autenticação independente | <http://127.0.0.1:5302/entrar>     |
+| Competições independente  | <http://127.0.0.1:5303/torneios>   |
 | Saúde da API              | <http://127.0.0.1:5400/api/health> |
 
 Use `127.0.0.1` nos endereços. Para encerrar os serviços, pressione `Ctrl+C` no terminal que executa o projeto.
@@ -55,12 +56,18 @@ npm run dev:auth
 ```
 
 ```powershell
+npm run dev:competition
+```
+
+```powershell
 npm run dev:shell
 ```
 
 O shell depende do portal para exibir a página inicial. Se o portal estiver parado, o shell apresenta a opção de tentar novamente; a página Sobre permanece acessível. Inicie o portal e clique em **Tentar novamente** para recuperar a página inicial.
 
 As telas de conta dependem do remoto `auth`. Shell e remoto compartilham a sessão no portal integrado; aplicações em portas diferentes mantêm sessões independentes.
+
+As rotas de torneios usam o remoto `competition`. Veja [torneios e inscrições](docs/competitions.md) para dados, regras e compatibilidade com inscrições antigas.
 
 ### Build e prévia
 
@@ -81,11 +88,14 @@ apps/
   shell/        Navegação e carregamento dos microfrontends
   portal/       Primeiro microfrontend: apresentação pública
   auth/         Login, cadastro, vínculo e conta
+  competition/  Torneios e inscrições
   api/          Integração com a API oficial do Clash Royale
 packages/
   contracts/    Contratos e validação em execução
   http/         Cliente Axios compartilhado
   session/      Sessão Firebase e vínculo do jogador
+  firebase/     Aplicação Firebase e SDKs compartilhados
+  competitions/ Acesso aos torneios e transações de inscrição
   ui/           Componentes e estilos compartilhados
 tooling/        Configuração de build e aliases
 scripts/        Inicialização e verificação de arquitetura
@@ -113,7 +123,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
+Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
 
 ## API
 
@@ -130,7 +140,9 @@ As tags aceitam letras e números, com `#` inicial opcional. A tag é normalizad
 
 ## Migração
 
-Estão implementadas a fundação e a **etapa 2 de autenticação**: login, cadastro, sessão compartilhada, reconhecimento do vínculo antigo e criação do novo vínculo por UID. Inscrições, ranking, perfil completo, loja e administração serão migrados nas próximas etapas. Não há importação automática de dados anteriores.
+Estão implementadas a fundação, a autenticação e a **etapa 3 de competições**: lista e detalhes de torneios, novas inscrições e cancelamentos por transação, Meus torneios e consulta das inscrições antigas. Ranking, perfil completo, loja e administração serão migrados nas próximas etapas. Não há importação automática de dados anteriores.
+
+As [regras de competições](docs/competitions.md#aplicar-as-regras) alteram as permissões do fluxo antigo de torneios. Revise a transição antes de publicá-las no Firebase compartilhado.
 
 Veja o [levantamento das funcionalidades e as próximas etapas](docs/migration.md). Os três projetos originais permanecem como referência, sem alteração dos serviços e dados existentes.
 

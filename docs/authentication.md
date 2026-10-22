@@ -21,11 +21,11 @@ Após mudar o `.env`, reinicie o desenvolvimento ou gere novamente os builds.
 
 [firebase/firestore.rules](../firebase/firestore.rules) foi preparado a partir das regras existentes fornecidas durante a migração. Revise o arquivo e aplique seu conteúdo em **Firestore Database → Regras** antes de usar o novo vínculo com dados reais.
 
-O arquivo preserva o comportamento das coleções antigas e protege `playerProfiles`: cada usuário consulta e cria apenas seu próprio documento, identificado pelo UID. Somente os quatro campos do vínculo são aceitos; alterações, exclusões, listagem e acesso a outros usuários ficam negados.
+O arquivo protege `playerProfiles`: cada usuário consulta e cria apenas seu próprio documento, identificado pelo UID. Somente os quatro campos do vínculo são aceitos; alterações, exclusões, listagem e acesso a outros usuários ficam negados.
 
-As permissões de diferentes `match` são combinadas: basta uma permitir a operação. Por isso a permissão geral exclui expressamente `playerProfiles`. Uma regra restrita para essa coleção, acompanhada de acesso geral irrestrito, não protege os documentos.
+As permissões de diferentes `match` são combinadas: basta uma permitir a operação. Por isso a permissão geral exclui expressamente as coleções já protegidas. Uma regra restrita para essa coleção, acompanhada de acesso geral irrestrito, não protege os documentos.
 
-**As coleções antigas ainda mantêm permissões amplas para usuários autenticados**, incluindo gravações em torneios, ranking e loja, como antes. A restrição por papel e a validação de saldo fazem parte das etapas dessas funcionalidades. Este arquivo é uma política de transição, não a autorização final do sistema.
+**Ranking, loja e outras coleções ainda não migradas conservam permissões amplas para usuários autenticados.** Torneios e inscrições já têm uma política específica: consulte [a transição das regras de competições](competitions.md#aplicar-as-regras) antes de publicar o arquivo. A restrição de acesso das demais funcionalidades será tratada nas próximas etapas.
 
 Não há publicação automática de regras. Os testes com respostas simuladas não executam as regras no Firebase. No simulador do console, confira:
 
@@ -43,7 +43,7 @@ Não há publicação automática de regras. Os testes com respostas simuladas n
 | `/vincular-jogador` | Consulta da tag pela API e criação do vínculo |
 | `/minha-conta`      | Jogador vinculado à sessão                    |
 
-As rotas antigas `/signup`, `/registerIdClashRoyale` e `/dashboard` redirecionam para as telas novas. `/dashboard` abre a conta enquanto competições está sendo migrado.
+As rotas antigas `/signup`, `/registerIdClashRoyale` e `/dashboard` redirecionam para as telas novas. `/dashboard` abre Minha conta; os torneios estão em `/torneios`.
 
 O Firebase restaura a sessão antes de uma rota decidir se exige login. Após autenticar, o sistema procura o vínculo existente. Contas sem vínculo seguem para o formulário da tag. Falhas de leitura apresentam erro e opção de tentar novamente, sem serem tratadas como ausência de cadastro.
 
@@ -68,7 +68,7 @@ Os identificadores antigos de inscrições, loja e ranking permanecem preservado
 
 ## Sessão compartilhada
 
-`@clash-cup/session` contém o driver Firebase, o repositório do vínculo e o estado consumido com `useSyncExternalStore`. O Module Federation compartilha o pacote como singleton: shell e remoto observam a mesma sessão dentro do portal.
+`@clash-cup/firebase` reúne a aplicação Firebase e os SDKs compartilhados. `@clash-cup/session` contém o driver Firebase, o repositório do vínculo e o estado consumido com `useSyncExternalStore`. O Module Federation compartilha o pacote como singleton: shell e remoto observam a mesma sessão dentro do portal.
 
 A persistência usa a sessão da aba. Recarregar mantém o login; encerrar a sessão da aba encerra essa persistência. O SDK administra os tokens. Aplicações independentes abertas em portas diferentes têm origens distintas e sessões separadas.
 

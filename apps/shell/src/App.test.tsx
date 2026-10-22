@@ -1,0 +1,50 @@
+// @vitest-environment jsdom
+import '@testing-library/jest-dom/vitest';
+import { cleanup, render, screen } from '@testing-library/react';
+import { Link, MemoryRouter, Route, Routes } from 'react-router-dom';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { App } from './App';
+vi.mock('@clash-cup/session', () => ({
+  useSession: () => ({ status: 'anonymous', user: null, pending: false }),
+  session: { signOut: vi.fn() },
+}));
+vi.mock('./RemoteSlot', () => ({
+  RemoteSlot: ({ name }: { name: string }) => (
+    <Routes>
+      <Route path="/" element={<h1>Portal {name}</h1>} />
+      <Route path="/entrar" element={<h1>Login {name}</h1>} />
+      <Route
+        path="/torneios/:id"
+        element={
+          <>
+            <h1>Detalhes {name}</h1>
+            <Link to="/entrar">Abrir login</Link>
+          </>
+        }
+      />
+    </Routes>
+  ),
+}));
+afterEach(cleanup);
+describe('shell route composition', () => {
+  it.each([
+    ['/', 'Portal portal'],
+    ['/entrar', 'Login auth'],
+    ['/torneios/cup', 'Detalhes competition'],
+  ])('provides the root route context to %s', (path, heading) => {
+    render(
+      <MemoryRouter initialEntries={[path]}>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('heading', { name: heading })).toBeVisible();
+  });
+  it('keeps unknown paths in the shell', () => {
+    render(
+      <MemoryRouter initialEntries={['/torneios/cup/unknown']}>
+        <App />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole('heading', { name: 'Página não encontrada' })).toBeVisible();
+  });
+});

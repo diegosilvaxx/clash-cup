@@ -2,9 +2,10 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Legacy permissions remain unchanged during the staged migration.
+    // Collections not yet migrated keep their legacy policy.
     match /{collection}/{document=**} {
-      allow read, write: if request.auth != null && collection != 'playerProfiles';
+      allow read, write: if request.auth != null
+        && !(collection in ['playerProfiles', 'tournament', 'myTournament', 'competitionRegistrations']);
     }
 
     match /playerProfiles/{uid} {
@@ -30,7 +31,81 @@ service cloud.firestore {
       allow list, update, delete: if false;
     }
 
-    match /tournament/{document} { allow read: if true; }
+    function owner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+    function admin() {
+      return request.auth != null && request.auth.token.get('admin', false) == true;
+    }
+    function validCount(value) {
+      return (value is int && value >= 0)
+        || (value is string && value.matches('^[0-9]+$'));
+    }
+    function counterChanged(tid, delta) {
+      let path = /databases/$(database)/documents/tournament/$(tid);
+      let before = get(path).data;
+      let after = getAfter(path).data;
+      let change = after.lastRegistrationChange;
+      return validCount(before.vacancies) && validCount(before.vacanciesAvailable)
+        && after.diff(before).affectedKeys().hasOnly(['vacanciesAvailable', 'lastRegistrationChange'])
+        && after.vacanciesAvailable is int
+        && after.vacanciesAvailable == int(before.vacanciesAvailable) + delta
+        && after.vacanciesAvailable >= 0 && after.vacanciesAvailable <= int(before.vacancies)
+        && change.keys().hasOnly(['uid', 'kind', 'at'])
+        && change.uid == request.auth.uid && change.at == request.time
+        && change.kind == (delta == 1 ? 'join' : 'cancel')
+        && (delta == -1 || before.get('status', 'open') == 'open');
+    }
+    function linkedTag(tag) {
+      let current = /databases/$(database)/documents/playerProfiles/$(request.auth.uid);
+      let email = request.auth.token.get('email', '');
+      let legacy = /databases/$(database)/documents/users/$(email);
+      return (exists(current) && get(current).data.idClashRoyale == tag)
+        || (request.auth.token.get('email_verified', false) == true
+          && exists(legacy) && get(legacy).data.idUser == email
+          && get(legacy).data.idClashRoyale is string
+          && (get(legacy).data.idClashRoyale.upper() == tag
+            || '#' + get(legacy).data.idClashRoyale.upper() == tag));
+    }
+    function noLegacyRegistration(tid) {
+      let tournament = get(/databases/$(database)/documents/tournament/$(tid)).data;
+      let oldId = tournament.get('id', '') + '-' + request.auth.token.get('email', '');
+      return tournament.get('id', '') == ''
+        || !exists(/databases/$(database)/documents/myTournament/$(oldId));
+    }
+    match /tournament/{tid} {
+      allow read: if true;
+      allow create, delete: if admin();
+      allow update: if admin() || (request.auth != null && (
+        (counterChanged(tid, 1)
+          && !exists(/databases/$(database)/documents/competitionRegistrations/$(request.auth.uid)/tournaments/$(tid))
+          && existsAfter(/databases/$(database)/documents/competitionRegistrations/$(request.auth.uid)/tournaments/$(tid)))
+        || (counterChanged(tid, -1)
+          && exists(/databases/$(database)/documents/competitionRegistrations/$(request.auth.uid)/tournaments/$(tid))
+          && !existsAfter(/databases/$(database)/documents/competitionRegistrations/$(request.auth.uid)/tournaments/$(tid)))
+      ));
+    }
+    match /competitionRegistrations/{uid}/tournaments/{tid} {
+      allow read: if owner(uid);
+      allow create: if owner(uid)
+        && request.resource.data.keys().hasOnly(['uid', 'tournamentId', 'idClashRoyale', 'registeredAt'])
+        && request.resource.data.uid == uid && request.resource.data.tournamentId == tid
+        && request.resource.data.registeredAt == request.time
+        && request.resource.data.idClashRoyale is string
+        && linkedTag(request.resource.data.idClashRoyale)
+        && noLegacyRegistration(tid) && counterChanged(tid, 1);
+      allow delete: if owner(uid) && (
+        !exists(/databases/$(database)/documents/tournament/$(tid)) || counterChanged(tid, -1)
+      );
+      allow update: if false;
+    }
+    match /myTournament/{id} {
+      allow read: if request.auth != null
+        && request.auth.token.get('email_verified', false) == true
+        && resource.data.idUser == request.auth.token.get('email', '');
+      // Historical registrations need an unambiguous canonical mapping before any mutation.
+      allow write: if false;
+    }
     match /shop/{document} { allow read: if true; }
     match /ranking/{document} { allow read: if true; }
     match /rankingHistory/{document} { allow read: if true; }

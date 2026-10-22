@@ -85,7 +85,10 @@ export function createSessionStore(driver: SessionDriver) {
         started = false;
         publish({
           status:
-            error instanceof SessionError && error.code === 'configuration-missing'
+            typeof error === 'object' &&
+            error !== null &&
+            'code' in error &&
+            error.code === 'configuration-missing'
               ? 'unconfigured'
               : 'error',
           error: getSessionError(error),

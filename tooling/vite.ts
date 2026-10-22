@@ -5,7 +5,7 @@ import { defineConfig, loadEnv, type Plugin } from 'vite';
 import { runtimeConfigSchema } from '../packages/contracts/src/index.ts';
 import { aliases, repositoryRoot } from './aliases.ts';
 
-const ports = { shell: 5300, portal: 5301, auth: 5302 } as const;
+const ports = { shell: 5300, portal: 5301, auth: 5302, competition: 5303 } as const;
 
 function runtimeConfigPlugin(mode: string): Plugin {
   const env = loadEnv(mode, repositoryRoot, 'CUP_');
@@ -14,6 +14,7 @@ function runtimeConfigPlugin(mode: string): Plugin {
       remotes: {
         portal: env.CUP_PORTAL_REMOTE_URL || 'http://127.0.0.1:5301/remoteEntry.js',
         auth: env.CUP_AUTH_REMOTE_URL || 'http://127.0.0.1:5302/remoteEntry.js',
+        competition: env.CUP_COMPETITION_REMOTE_URL || 'http://127.0.0.1:5303/remoteEntry.js',
       },
     }),
   );
@@ -55,6 +56,15 @@ export function createAppConfig(application: keyof typeof ports) {
             'react-router-dom': { singleton: true, requiredVersion: '7.18.4' },
             'react-router': { singleton: true, requiredVersion: '7.18.4' },
             'styled-components': { singleton: true, requiredVersion: '6.5.3' },
+            '@clash-cup/firebase': {
+              singleton: true,
+              version: '0.1.0',
+              requiredVersion: '0.1.0',
+              import: resolve(repositoryRoot, 'packages/firebase/src/index.ts').replaceAll(
+                '\\',
+                '/',
+              ),
+            },
             '@clash-cup/session': {
               singleton: true,
               version: '0.1.0',

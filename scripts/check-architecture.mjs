@@ -19,8 +19,12 @@ async function visit(directory) {
     const imports = [...source.matchAll(/(?:from\s*|import\s*\()['"]([^'"]+)['"]/g)];
     for (const match of imports) {
       const specifier = match[1];
-      if (app && app !== 'api' && /^firebase(?:\/|$)/.test(specifier))
-        failures.push(`${name}: use a sessão compartilhada para acessar Firebase`);
+      if (
+        !name.startsWith('packages/firebase/') &&
+        /^firebase(?:\/|$)/.test(specifier) &&
+        !name.endsWith('.test.ts')
+      )
+        failures.push(`${name}: use o pacote Firebase compartilhado`);
       if (specifier.startsWith('.')) {
         const target = relative(root, resolve(directory, specifier)).replaceAll('\\', '/');
         const targetApp = target.match(/^apps\/([^/]+)\//)?.[1];

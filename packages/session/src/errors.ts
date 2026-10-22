@@ -14,6 +14,7 @@ export function getSessionError(error: unknown): string {
   const code =
     typeof error === 'object' && error !== null && 'code' in error ? String(error.code) : '';
   const messages: Record<string, string> = {
+    'configuration-missing': 'O login ainda não está configurado neste ambiente.',
     'auth/invalid-credential': 'Email ou senha inválidos.',
     'auth/user-not-found': 'Email ou senha inválidos.',
     'auth/wrong-password': 'Email ou senha inválidos.',

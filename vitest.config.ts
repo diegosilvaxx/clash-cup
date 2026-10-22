@@ -8,6 +8,9 @@ export default defineConfig({
   resolve: {
     alias: {
       ...aliases,
+      '@clash-cup/firebase': fileURLToPath(
+        new URL('./packages/firebase/src/index.ts', import.meta.url),
+      ),
       '@clash-cup/session': fileURLToPath(
         new URL('./packages/session/src/index.ts', import.meta.url),
       ),

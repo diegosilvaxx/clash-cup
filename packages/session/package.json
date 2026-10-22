@@ -7,7 +7,7 @@
   "dependencies": {
     "@clash-cup/contracts": "0.1.0",
     "@clash-cup/http": "0.1.0",
-    "firebase": "13.1.0",
-    "react": "19.3.0"
+    "react": "19.3.0",
+    "@clash-cup/firebase": "0.1.0"
   }
 }

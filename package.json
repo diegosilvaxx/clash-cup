@@ -27,7 +27,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "check": "npm run architecture && npm run typecheck && npm run lint && npm run format:check && npm test && npm run build",
-    "dev:auth": "npm run dev --workspace @clash-cup/auth"
+    "dev:auth": "npm run dev --workspace @clash-cup/auth",
+    "dev:competition": "npm run dev --workspace @clash-cup/competition"
   },
   "dependencies": {
     "@module-federation/runtime": "2.9.2",

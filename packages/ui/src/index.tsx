@@ -7,9 +7,11 @@ export { AccountMenu } from './AccountMenu';
 export function PageLayout({
   children,
   accountMenu,
+  competitionNavigation = false,
 }: {
   children: ReactNode;
   accountMenu?: ReactNode;
+  competitionNavigation?: boolean;
 }) {
   return (
     <Frame>
@@ -23,6 +25,12 @@ export function PageLayout({
           <nav aria-label="Navegação principal">
             <Link to="/">Início</Link>
             <Link to="/sobre">Sobre</Link>
+            {competitionNavigation && (
+              <>
+                <Link to="/torneios">Torneios</Link>
+                <Link to="/meus-torneios">Meus torneios</Link>
+              </>
+            )}
             {accountMenu}
           </nav>
         </HeaderContent>

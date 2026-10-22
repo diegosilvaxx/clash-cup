@@ -1,4 +1,3 @@
-import { getApps, initializeApp } from 'firebase/app';
 import {
   browserSessionPersistence,
   createUserWithEmailAndPassword,
@@ -11,7 +10,8 @@ import {
   signOut,
   type Auth,
   type Unsubscribe,
-} from 'firebase/auth';
+  getFirebaseApp,
+} from '@clash-cup/firebase';
 import { readFirebaseConfig } from './config';
 import { SessionError } from './errors';
 import { createProfileRepository } from './profiles';
@@ -37,8 +37,7 @@ export function createFirebaseDriver(env: Record<string, unknown>): SessionDrive
   return {
     async start(onUser, onError) {
       const config = readFirebaseConfig(env);
-      const app =
-        getApps().find((app) => app.name === 'clash-cup') ?? initializeApp(config, 'clash-cup');
+      const app = getFirebaseApp(env);
       auth = getAuth(app);
       auth.languageCode = 'pt-BR';
       profiles = createProfileRepository(config.projectId);

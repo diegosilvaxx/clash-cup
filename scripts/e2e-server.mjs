@@ -11,9 +11,10 @@ Object.assign(process.env, {
   CUP_API_PORT: '5400',
   CUP_API_URL: 'http://127.0.0.1:5400',
   CUP_PORTAL_REMOTE_URL: 'http://127.0.0.1:5301/remoteEntry.js',
+  CUP_COMPETITION_REMOTE_URL: 'http://127.0.0.1:5303/remoteEntry.js',
   CUP_AUTH_REMOTE_URL: 'http://127.0.0.1:5302/remoteEntry.js',
 });
-for (const app of ['api', 'shell', 'portal', 'auth']) {
+for (const app of ['api', 'shell', 'portal', 'auth', 'competition']) {
   await build({
     root: resolve(root, 'apps', app),
     configFile: resolve(root, 'apps', app, 'vite.config.ts'),

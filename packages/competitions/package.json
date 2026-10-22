@@ -1,0 +1,12 @@
+{
+  "name": "@clash-cup/competitions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@clash-cup/firebase": "0.1.0",
+    "@clash-cup/session": "0.1.0",
+    "zod": "4.6.5"
+  }
+}

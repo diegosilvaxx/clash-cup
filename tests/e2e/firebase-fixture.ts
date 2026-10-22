@@ -1,4 +1,5 @@
 import type { BrowserContext } from '@playwright/test';
+import { createCompetitionFixture, type CompetitionFixtureOptions } from './competition-fixture';
 
 const uid = 'fixture-user';
 const email = 'player@example.test';
@@ -11,8 +12,13 @@ const profileFields = {
 
 export async function mockFirebase(
   context: BrowserContext,
-  options: { profile?: 'current' | 'legacy' | 'none'; profileDenied?: boolean } = {},
+  options: {
+    profile?: 'current' | 'legacy' | 'none';
+    profileDenied?: boolean;
+    competitions?: CompetitionFixtureOptions;
+  } = {},
 ) {
+  const competition = createCompetitionFixture(options.competitions);
   let current = options.profile === 'current' ? profileFields : null;
   let verified = options.profile === 'legacy';
   let writes = 0;
@@ -41,6 +47,7 @@ export async function mockFirebase(
       'access-control-allow-credentials': 'true',
       'access-control-allow-methods': 'GET,POST,PATCH,OPTIONS',
       'access-control-allow-headers':
+        route.request().headers()['access-control-request-headers'] ||
         'authorization,content-type,x-client-version,x-firebase-gmpid,x-firebase-client,x-firebase-locale,x-firebase-client-log-type,x-firebase-appcheck',
     };
     const reply = (options: NonNullable<Parameters<typeof route.fulfill>[0]>) =>
@@ -110,6 +117,7 @@ export async function mockFirebase(
       return;
     }
     if (url.hostname === 'firestore.googleapis.com') {
+      if (await competition.handle(route, reply)) return;
       if (path.endsWith(`/playerProfiles/${uid}`)) {
         if (options.profileDenied) {
           await reply({ status: 403, json: { error: { status: 'PERMISSION_DENIED' } } });
@@ -153,6 +161,7 @@ export async function mockFirebase(
     );
   });
   return {
+    competition,
     getWrites: () => writes,
     getBlocked: () => blocked,
     failPlayerLookup: (fail: boolean) => {

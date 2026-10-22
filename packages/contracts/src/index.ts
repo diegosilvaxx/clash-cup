@@ -25,6 +25,7 @@ export const runtimeConfigSchema = z.object({
   remotes: z.object({
     portal: remoteUrlSchema,
     auth: remoteUrlSchema,
+    competition: remoteUrlSchema,
   }),
 });
 export const apiErrorSchema = z.object({
