@@ -1,4 +1,6 @@
 export interface SessionUser {
+  admin?: boolean;
+  superAdmin?: boolean;
   uid: string;
   email: string | null;
   emailVerified: boolean;

@@ -5,7 +5,14 @@ import { defineConfig, loadEnv, type Plugin } from 'vite';
 import { runtimeConfigSchema } from '../packages/contracts/src/index.ts';
 import { aliases, repositoryRoot } from './aliases.ts';
 
-const ports = { shell: 5300, portal: 5301, auth: 5302, competition: 5303, player: 5304 } as const;
+const ports = {
+  shell: 5300,
+  portal: 5301,
+  auth: 5302,
+  competition: 5303,
+  player: 5304,
+  admin: 5305,
+} as const;
 
 function runtimeConfigPlugin(mode: string): Plugin {
   const env = loadEnv(mode, repositoryRoot, 'CUP_');
@@ -16,6 +23,7 @@ function runtimeConfigPlugin(mode: string): Plugin {
         auth: env.CUP_AUTH_REMOTE_URL || 'http://127.0.0.1:5302/remoteEntry.js',
         competition: env.CUP_COMPETITION_REMOTE_URL || 'http://127.0.0.1:5303/remoteEntry.js',
         player: env.CUP_PLAYER_REMOTE_URL || 'http://127.0.0.1:5304/remoteEntry.js',
+        admin: env.CUP_ADMIN_REMOTE_URL || 'http://127.0.0.1:5305/remoteEntry.js',
       },
     }),
   );

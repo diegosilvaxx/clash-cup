@@ -1,3 +1,4 @@
+import { createAdminFixture } from './admin-fixture';
 import type { BrowserContext } from '@playwright/test';
 import {
   createCompetitionFixture,
@@ -17,6 +18,7 @@ const profileFields = {
 export async function mockFirebase(
   context: BrowserContext,
   options: {
+    access?: 'admin' | 'responsible';
     profile?: 'current' | 'legacy' | 'none';
     profileDenied?: boolean;
     competitions?: CompetitionFixtureOptions;
@@ -25,6 +27,8 @@ export async function mockFirebase(
     rewards?: RewardFixtureOptions;
   } = {},
 ) {
+  const admin = createAdminFixture(options.access);
+  await context.route('**/api/admin/**', admin.handle);
   const competition = createCompetitionFixture({
     ...options.competitions,
     ...(options.rewards ? { rewards: options.rewards } : {}),
@@ -40,7 +44,7 @@ export async function mockFirebase(
   function jwt() {
     const now = Math.floor(Date.now() / 1000);
     const encode = (value: unknown) => Buffer.from(JSON.stringify(value)).toString('base64url');
-    return `${encode({ alg: 'RS256', typ: 'JWT' })}.${encode({ aud: 'demo-clash-cup', iss: 'https://securetoken.google.com/demo-clash-cup', sub: uid, user_id: uid, email, email_verified: verified, auth_time: now, iat: now, exp: now + 3600, firebase: { sign_in_provider: 'password', identities: { email: [email] } } })}.fixture-signature`;
+    return `${encode({ alg: 'RS256', typ: 'JWT' })}.${encode({ aud: 'demo-clash-cup', iss: 'https://securetoken.google.com/demo-clash-cup', sub: uid, admin: Boolean(options.access), superAdmin: options.access === 'responsible', user_id: uid, email, email_verified: verified, auth_time: now, iat: now, exp: now + 3600, firebase: { sign_in_provider: 'password', identities: { email: [email] } } })}.fixture-signature`;
   }
   function account() {
     return {
@@ -222,6 +226,7 @@ export async function mockFirebase(
       chestFailure = fail;
     },
     competition,
+    admin,
     getWrites: () => writes,
     getBlocked: () => blocked,
     failPlayerLookup: (fail: boolean) => {

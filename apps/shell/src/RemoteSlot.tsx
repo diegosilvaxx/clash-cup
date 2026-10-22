@@ -45,6 +45,7 @@ export function RemoteSlot({ name = 'portal' }: { name?: RemoteName }) {
           auth: 'o acesso à conta',
           competition: 'os torneios',
           player: 'a área do jogador',
+          admin: 'a administração',
         }[name]
       }
     >

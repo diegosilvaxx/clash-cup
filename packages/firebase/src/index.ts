@@ -7,6 +7,7 @@ export {
   getAuth,
   GoogleAuthProvider,
   onAuthStateChanged,
+  onIdTokenChanged,
   setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,

@@ -22,13 +22,13 @@ O pacote `rewards` reúne os adaptadores, as transações e o catálogo de 22 em
 | `ranking`        | `tag`, `name`, `score`, `clan.name` opcional                                 |
 | `rankingHistory` | Os campos do ranking, `month` e `year` numéricos                             |
 
-**Gold é uma pontuação interna da comunidade, sem integração com a moeda do jogo ou pagamentos.** Esta etapa não concede Gold nem importa resultados. A administração e a importação idempotente de resultados serão implementadas na etapa 6; não use o importador antigo, que pode creditar o mesmo resultado várias vezes.
+**Gold é uma pontuação interna da comunidade, sem integração com a moeda do jogo ou pagamentos.** Os créditos de Gold vêm da [importação de resultados no painel administrativo](administration.md#importação-de-resultados); não use o importador antigo, que pode creditar o mesmo resultado várias vezes.
 
 ### Associação do saldo
 
 Informar uma tag pública não comprova que a conta é dona daquele saldo. Por isso, compras e trocas de emblema exigem `ownerUid` associado por um administrador confiável. O próprio usuário não pode criar saldo, alterar o proprietário ou conceder Gold.
 
-O saldo antigo permanece no mesmo documento e aparece somente para consulta até essa associação. Para habilitar uma conta, a organização deve confirmar a titularidade por um processo próprio e, pelo console Firebase, adicionar `ownerUid` com o UID correto ao documento existente de `shop`. Não duplique o saldo em um novo documento. Confira que existe apenas um registro com aquela `idClashRoyale` e que a tag está no formato `#ABC`, em maiúsculas. A leitura não faz migração nem corrige valores.
+O saldo antigo permanece no mesmo documento e aparece somente para consulta até essa associação. Para habilitar uma conta, a organização deve confirmar a titularidade por um processo próprio e, pelo painel administrativo ou console Firebase, adicionar `ownerUid` com o UID correto ao documento existente de `shop`. Não duplique o saldo em um novo documento. Confira que existe apenas um registro com aquela `idClashRoyale` e que a tag está no formato `#ABC`, em maiúsculas. A leitura não faz migração nem corrige valores.
 
 Para uma conta sem saldo anterior, um administrador pode criar um documento de teste com:
 
@@ -73,7 +73,7 @@ As três coleções são lidas ao entrar ou atualizar o ranking, e os filtros op
 
 Revise [firebase/firestore.rules](../firebase/firestore.rules). Não há publicação automática. **A nova política retira a escrita genérica de usuários autenticados em `shop`, `ranking` e `rankingHistory`.** Compras antigas e importações pelo painel legado deixam de funcionar depois da publicação. Combine a transição antes de aplicar em uma base compartilhada.
 
-Escrita de ranking e concessão/associação de saldo exigem a custom claim `admin: true`, concedida em ambiente confiável, ou o console Firebase. A coleção antiga `admins` não concede esse papel. A leitura pública de `shop`, já utilizada pelo ranking legado, foi mantida; esses documentos não devem conter credenciais nem informações pessoais. As demais coleções ainda não migradas mantêm a política de transição descrita em [Autenticação](authentication.md).
+Escrita de ranking e associação de saldo usam o [BFF administrativo](administration.md), que verifica a custom claim `admin: true` e o papel atual da conta. O console Firebase também permite operações confiáveis. O SDK do navegador não oferece escrita administrativa nessas coleções, e a coleção antiga `admins` não concede esse papel. A leitura pública de `shop`, já utilizada pelo ranking legado, foi mantida; esses documentos não devem conter credenciais nem informações pessoais. As demais coleções ainda não migradas mantêm a política de transição descrita em [Autenticação](authentication.md).
 
 ### Verificar em uma base de teste
 

@@ -11,3 +11,8 @@ test-results/
 *.log
 .DS_Store
 Thumbs.db
+
+secrets/
+*service-account*.json
+firebase-admin-key.json
+*firebase-adminsdk*.json

@@ -19,6 +19,8 @@ async function visit(directory) {
     const imports = [...source.matchAll(/(?:from\s*|import\s*\()['"]([^'"]+)['"]/g)];
     for (const match of imports) {
       const specifier = match[1];
+      if (specifier.startsWith('firebase-admin') && app !== 'api')
+        failures.push(`${name}: SDK administrativo fora do servidor`);
       if (
         !name.startsWith('packages/firebase/') &&
         /^firebase(?:\/|$)/.test(specifier) &&
@@ -36,7 +38,11 @@ async function visit(directory) {
       if (app && app !== 'api' && (specifier.startsWith('node:') || specifier === '@clash-cup/api'))
         failures.push(`${name}: dependência de servidor no frontend`);
     }
-    if (app && app !== 'api' && /CLASH_ROYALE_API_TOKEN|api\.clashroyale\.com/.test(source))
+    if (
+      app &&
+      app !== 'api' &&
+      /CLASH_ROYALE_API_TOKEN|GOOGLE_APPLICATION_CREDENTIALS|api\.clashroyale\.com/.test(source)
+    )
       failures.push(`${name}: integração externa no frontend`);
   }
 }

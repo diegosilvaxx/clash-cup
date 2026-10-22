@@ -8,11 +8,13 @@ export function PageLayout({
   children,
   accountMenu,
   competitionNavigation = false,
+  adminNavigation = false,
   playerNavigation = false,
 }: {
   children: ReactNode;
   accountMenu?: ReactNode;
   competitionNavigation?: boolean;
+  adminNavigation?: boolean;
   playerNavigation?: boolean;
 }) {
   return (
@@ -35,6 +37,7 @@ export function PageLayout({
               </>
             )}
             {playerNavigation && <Link to="/perfil">Área do jogador</Link>}
+            {adminNavigation && <Link to="/admin">Administração</Link>}
             {accountMenu}
           </nav>
         </HeaderContent>

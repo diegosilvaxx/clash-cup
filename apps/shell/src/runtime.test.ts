@@ -14,6 +14,7 @@ beforeEach(() => {
         auth: 'http://127.0.0.1:5302/remoteEntry.js',
         competition: 'http://127.0.0.1:5303/remoteEntry.js',
         player: 'http://127.0.0.1:5304/remoteEntry.js',
+        admin: 'http://127.0.0.1:5305/remoteEntry.js',
       },
     },
   });
@@ -51,6 +52,7 @@ describe('remote recovery', () => {
           auth: 'http://127.0.0.1:5302/remoteEntry.js',
           competition: 'http://127.0.0.1:5303/remoteEntry.js',
           player: 'http://127.0.0.1:5304/remoteEntry.js',
+          admin: 'http://127.0.0.1:5305/remoteEntry.js',
         },
       },
     });

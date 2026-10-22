@@ -25,18 +25,21 @@ Para consultar jogadores, baús e torneios na API oficial, configure `CLASH_ROYA
 
 Para login e vínculo do jogador, preencha os quatro campos `VITE_FIREBASE_*` e confira a [configuração da autenticação](docs/authentication.md), incluindo métodos de login, domínio autorizado e regras do Firestore. Sem essa configuração, o portal público permanece acessível e o login informa a indisponibilidade.
 
+Para o painel administrativo, configure também as credenciais do servidor e o primeiro responsável conforme [Administração](docs/administration.md).
+
 ```powershell
 npm run dev
 ```
 
-| Serviço                   | Endereço                           |
-| ------------------------- | ---------------------------------- |
-| Shell integrado           | <http://127.0.0.1:5300>            |
-| Portal independente       | <http://127.0.0.1:5301>            |
-| Autenticação independente | <http://127.0.0.1:5302/entrar>     |
-| Competições independente  | <http://127.0.0.1:5303/torneios>   |
-| Jogador independente      | <http://127.0.0.1:5304>            |
-| Saúde da API              | <http://127.0.0.1:5400/api/health> |
+| Serviço                    | Endereço                           |
+| -------------------------- | ---------------------------------- |
+| Shell integrado            | <http://127.0.0.1:5300>            |
+| Portal independente        | <http://127.0.0.1:5301>            |
+| Autenticação independente  | <http://127.0.0.1:5302/entrar>     |
+| Competições independente   | <http://127.0.0.1:5303/torneios>   |
+| Jogador independente       | <http://127.0.0.1:5304>            |
+| Administração independente | <http://127.0.0.1:5305/admin>      |
+| Saúde da API               | <http://127.0.0.1:5400/api/health> |
 
 Use `127.0.0.1` nos endereços. Para encerrar os serviços, pressione `Ctrl+C` no terminal que executa o projeto.
 
@@ -62,6 +65,10 @@ npm run dev:competition
 
 ```powershell
 npm run dev:player
+```
+
+```powershell
+npm run dev:admin
 ```
 
 ```powershell
@@ -97,6 +104,7 @@ apps/
   auth/         Login, cadastro, vínculo e conta
   competition/  Torneios, inscrições e ranking
   player/       Perfil, baús, VIP, loja e emblemas
+  admin/        Torneios, saldos, resultados e acessos administrativos
   api/          Integração com a API oficial do Clash Royale
 packages/
   contracts/    Contratos e validação em execução
@@ -132,7 +140,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, perfil, baús, loja, emblemas, ranking, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
+Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, perfil, baús, loja, emblemas, ranking, administração, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
 
 ## API
 
@@ -157,9 +165,9 @@ As tags aceitam letras e números, com `#` inicial opcional. A tag é normalizad
 
 ## Migração
 
-Estão implementadas as etapas 1 a 5: fundação, autenticação, competições, área do jogador, loja e ranking. Administração e importação de resultados ficam para a próxima etapa. Não há importação automática de dados anteriores.
+Estão implementadas as etapas 1 a 6: fundação, autenticação, competições, área do jogador, loja, ranking e administração com importação de resultados. Conteúdo público, acabamento e entrega ficam para as próximas etapas. Não há importação automática de dados anteriores.
 
-As [regras de competições](docs/competitions.md#aplicar-as-regras) alteram as permissões do fluxo antigo de torneios. As [regras de loja e ranking](docs/rewards.md#aplicar-as-regras) também restringem as gravações antigas e exigem associação do saldo ao UID. Revise a transição e valide as regras em uma base de teste antes de publicá-las no Firebase compartilhado.
+As [regras de competições](docs/competitions.md#aplicar-as-regras) alteram as permissões do fluxo antigo de torneios. As [regras de loja e ranking](docs/rewards.md#aplicar-as-regras) também restringem as gravações antigas e exigem associação do saldo ao UID. A [administração](docs/administration.md#autorização-e-regras) usa operações autorizadas pelo BFF e mantém os comprovantes privados. Revise a transição e valide as regras em uma base de teste antes de publicá-las no Firebase compartilhado.
 
 Veja o [levantamento das funcionalidades e as próximas etapas](docs/migration.md). Os três projetos originais permanecem como referência, sem alteração dos serviços e dados existentes.
 

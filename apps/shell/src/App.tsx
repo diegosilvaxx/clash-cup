@@ -7,6 +7,10 @@ export function App() {
   const state = useSession();
   const { pathname } = useLocation();
   const remotes = [
+    {
+      name: 'admin',
+      paths: ['/admin', '/admin/torneios', '/admin/saldos', '/admin/resultados', '/admin/acessos'],
+    },
     { name: 'portal', paths: ['/'] },
     { name: 'auth', paths: ['/entrar', '/cadastro', '/vincular-jogador', '/minha-conta'] },
     { name: 'competition', paths: ['/torneios', '/torneios/:id', '/meus-torneios', '/ranking'] },
@@ -15,6 +19,7 @@ export function App() {
   const remote = remotes.find(({ paths }) => paths.some((path) => matchPath(path, pathname)))?.name;
   return (
     <PageLayout
+      adminNavigation={state.user?.admin === true}
       competitionNavigation
       playerNavigation
       accountMenu={

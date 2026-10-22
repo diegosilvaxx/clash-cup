@@ -23,7 +23,7 @@ O site PHP consulta tabelas MySQL, enquanto a aplicação React consulta Firesto
 | `auth`        | Login, cadastro, saída e vínculo inicial com jogador                    | Base implementada                                            |
 | `competition` | Torneios, inscrições, meus torneios e ranking                           | Torneios, inscrições e ranking implementados                 |
 | `player`      | Perfil, baús, área VIP, loja e emblemas                                 | Perfil, baús, VIP informativo, loja e emblemas implementados |
-| `admin`       | Administração de torneios, ranking e permissões                         | Planejada                                                    |
+| `admin`       | Administração de torneios, ranking e permissões                         | Implementada                                                 |
 | `api`         | Adaptador para a API oficial e futuras operações de negócio autorizadas | Adaptador inicial implementado                               |
 
 Os limites seguem responsabilidades de produto. A API é backend; ela não é um microfrontend. Os pacotes compartilhados devem conter contratos, infraestrutura e elementos reutilizáveis, evitando importar telas ou regras de uma aplicação diretamente em outra.
@@ -35,10 +35,10 @@ flowchart LR
   Auth --> API
   Shell --> Competition
   Shell --> Player
-  Shell -.-> Admin
+  Shell --> Admin
   Player --> API
   Competition -.-> API
-  Admin -.-> API
+  Admin --> API
   API --> ClashRoyale[API oficial Clash Royale]
 ```
 
@@ -51,7 +51,7 @@ As ligações tracejadas representam integrações ainda não implementadas.
 3. **Competições (implementada):** remoto `competition`, listas de torneios, detalhes, inscrições e meus torneios. Preservar campos e identificadores existentes; controlar concorrência de vagas com operações atômicas. Revisar dados MySQL/Firestore antes de qualquer importação. Inscrições antigas permanecem somente leitura até revisão dos identificadores; detalhes e regras em [Competições](competitions.md).
 4. **Área do jogador (implementada):** remoto `player`, perfil, baús e área VIP. Integrar a API pelo mesmo domínio e cancelar consultas substituídas. Consultas ao abrir e ao atualizar, sem cache próprio nesta etapa. A área VIP preserva o conteúdo informativo do legado; assinaturas e benefícios dependem de integração futura. Veja [Área do jogador](player.md).
 5. **Loja e ranking (implementada):** saldo, emblemas, histórico e ranking. Compras atômicas e verificação de preço/propriedade nas regras; saldos antigos exigem associação administrativa ao UID. Veja [Loja, emblemas e ranking](rewards.md).
-6. **Administração:** importação idempotente de resultados para evitar pontuação e créditos duplicados, associação de saldos e remoto `admin`, gestão de torneios, ranking e administradores. Validar identidade e permissões nas operações de dados; ocultar menus no frontend não concede nem revoga autorização. Remover o fallback por email fixo presente no legado.
+6. **Administração (implementada):** remoto `admin`, gestão de torneios, associação de saldos, importação idempotente de resultados e gestão de acessos pelo responsável. O BFF verifica o token e o papel atual da conta; permissões usam custom claims em vez de emails fixos ou documentos do legado. Consulte [Administração](administration.md).
 7. **Conteúdo público e acabamento:** migrar regras, políticas, contato e apoiadores; confirmar os destinos atuais dos links; revisar responsividade, acessibilidade e identidade visual. Formulários só devem aparecer como funcionais quando houver tratamento de envio.
 8. **Entrega:** testes completos, CI, documentação, configuração de produção e Docker. Validar a execução a partir de uma cópia limpa e conferir a conectividade real da API oficial no ambiente escolhido.
 

@@ -24,6 +24,7 @@ vi.mock('firebase/auth', () => ({
   browserSessionPersistence: 'session',
   setPersistence: mocks.persistence,
   onAuthStateChanged: mocks.observe,
+  onIdTokenChanged: mocks.observe,
   signInWithPopup: mocks.google,
   signInWithEmailAndPassword: mocks.signIn,
   createUserWithEmailAndPassword: mocks.signUp,
@@ -55,6 +56,45 @@ beforeEach(() => {
   mocks.signOut.mockResolvedValue(undefined);
 });
 describe('Firebase session driver', () => {
+  it('publishes roles from token claims and ignores an outdated observer result', async () => {
+    const { createFirebaseDriver } = await import('./firebase-driver');
+    const driver = createFirebaseDriver(env);
+    const listener = vi.fn();
+    await driver.start(listener, vi.fn());
+    const emit = mocks.observe.mock.calls[0]![1] as (user: unknown) => void;
+    let resolve!: (value: unknown) => void;
+    const old = {
+      uid: 'old',
+      email: null,
+      emailVerified: false,
+      displayName: null,
+      getIdToken: async () => 'token',
+      getIdTokenResult: () =>
+        new Promise((done) => {
+          resolve = done;
+        }),
+    };
+    mocks.auth.currentUser = old;
+    emit(old);
+    const current = {
+      uid: 'current',
+      email: null,
+      emailVerified: false,
+      displayName: null,
+      getIdToken: async () => 'token',
+      getIdTokenResult: async () => ({ claims: { admin: true, superAdmin: false } }),
+    };
+    mocks.auth.currentUser = current;
+    emit(current);
+    await vi.waitFor(() =>
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({ uid: 'current', admin: true, superAdmin: false }),
+      ),
+    );
+    resolve({ claims: { admin: true, superAdmin: true } });
+    await Promise.resolve();
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
   it('uses one named Firebase app and configures session persistence before observing auth', async () => {
     const { createFirebaseDriver } = await import('./firebase-driver');
     const driver = createFirebaseDriver(env);

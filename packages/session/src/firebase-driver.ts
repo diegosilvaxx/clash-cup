@@ -3,7 +3,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   GoogleAuthProvider,
-  onAuthStateChanged,
+  onIdTokenChanged,
   setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -19,6 +19,7 @@ import type { SessionDriver, SessionUser } from './types';
 
 export function createFirebaseDriver(env: Record<string, unknown>): SessionDriver {
   let auth: Auth | undefined;
+  let observation = 0;
   let unsubscribe: Unsubscribe | undefined;
   let profiles: ReturnType<typeof createProfileRepository> | undefined;
   function requireAuth() {
@@ -42,21 +43,37 @@ export function createFirebaseDriver(env: Record<string, unknown>): SessionDrive
       auth.languageCode = 'pt-BR';
       profiles = createProfileRepository(config.projectId);
       await setPersistence(auth, browserSessionPersistence);
+      ++observation;
       unsubscribe?.();
-      unsubscribe = onAuthStateChanged(
+      unsubscribe = onIdTokenChanged(
         auth,
-        (user) =>
-          onUser(
-            user
-              ? {
-                  uid: user.uid,
-                  email: user.email,
-                  emailVerified: user.emailVerified,
-                  displayName: user.displayName,
-                }
-              : null,
-          ),
-        onError,
+        (user) => {
+          const current = ++observation;
+          if (!user) {
+            onUser(null);
+            return;
+          }
+          void user.getIdTokenResult().then(
+            (result) => {
+              if (current !== observation || auth?.currentUser?.uid !== user.uid) return;
+              onUser({
+                uid: user.uid,
+                email: user.email,
+                emailVerified: user.emailVerified,
+                displayName: user.displayName,
+                admin: result.claims.admin === true,
+                superAdmin: result.claims.superAdmin === true,
+              });
+            },
+            (error) => {
+              if (current === observation) onError(error);
+            },
+          );
+        },
+        (error) => {
+          ++observation;
+          onError(error);
+        },
       );
     },
     signIn: (email, password) =>

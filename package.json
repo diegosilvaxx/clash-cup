@@ -29,7 +29,9 @@
     "check": "npm run architecture && npm run typecheck && npm run lint && npm run format:check && npm test && npm run build",
     "dev:auth": "npm run dev --workspace @clash-cup/auth",
     "dev:competition": "npm run dev --workspace @clash-cup/competition",
-    "dev:player": "npm run dev --workspace @clash-cup/player"
+    "dev:player": "npm run dev --workspace @clash-cup/player",
+    "dev:admin": "npm run dev --workspace @clash-cup/admin",
+    "admin:role": "node scripts/admin-role.mjs"
   },
   "dependencies": {
     "@module-federation/runtime": "2.9.2",

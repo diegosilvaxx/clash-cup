@@ -1,4 +1,5 @@
 import { z } from 'zod';
+export * from './admin.ts';
 
 export const clashTagSchema = z
   .string()
@@ -70,6 +71,7 @@ export const runtimeConfigSchema = z.object({
     auth: remoteUrlSchema,
     competition: remoteUrlSchema,
     player: remoteUrlSchema,
+    admin: remoteUrlSchema,
   }),
 });
 export const apiErrorSchema = z.object({

@@ -15,6 +15,7 @@ vi.mock('./RemoteSlot', () => ({
       <Route path="/entrar" element={<h1>Login {name}</h1>} />
       <Route path="/perfil" element={<h1>Perfil {name}</h1>} />
       <Route path="/baus" element={<h1>Baús {name}</h1>} />
+      <Route path="/admin" element={<h1>Admin {name}</h1>} />
       <Route path="/ranking" element={<h1>Ranking {name}</h1>} />
       <Route path="/loja" element={<h1>Loja {name}</h1>} />
       <Route path="/meus-emblemas" element={<h1>Emblemas {name}</h1>} />
@@ -40,6 +41,7 @@ describe('shell route composition', () => {
     ['/baus', 'Baús player'],
     ['/area-vip', 'VIP player'],
     ['/ranking', 'Ranking competition'],
+    ['/admin', 'Admin admin'],
     ['/loja', 'Loja player'],
     ['/meus-emblemas', 'Emblemas player'],
     ['/torneios/cup', 'Detalhes competition'],
