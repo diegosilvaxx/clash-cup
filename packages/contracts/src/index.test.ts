@@ -28,6 +28,25 @@ describe('contracts', () => {
     for (const tag of ['', '#', 'AB', 'P0/Y9', 'P0?Y9', 'P0#Y9', 'A'.repeat(21)])
       expect(clashTagSchema.safeParse(tag).success).toBe(false);
   });
+  it('accepts same-origin modules and rejects executable or cross-origin path tricks', () => {
+    const paths = Object.fromEntries(
+      ['portal', 'auth', 'competition', 'player', 'admin'].map((name) => [
+        name,
+        `/remotes/${name}/remoteEntry.js`,
+      ]),
+    );
+    expect(runtimeConfigSchema.safeParse({ remotes: paths }).success).toBe(true);
+    for (const portal of [
+      '//evil.example/remoteEntry.js',
+      '/\\evil.example/remoteEntry.js',
+      'data:text/javascript,alert(1)',
+      'file:///module.js',
+      '/some module.js',
+      'https://user:password@example.test/module.js',
+    ]) {
+      expect(runtimeConfigSchema.safeParse({ remotes: { ...paths, portal } }).success).toBe(false);
+    }
+  });
   it('rejects executable remote URLs', () => {
     expect(
       runtimeConfigSchema.safeParse({ remotes: { portal: 'javascript:alert(1)' } }).success,

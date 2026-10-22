@@ -97,3 +97,11 @@ Os testes usam autenticação, banco e respostas externas simulados. Eles cobrem
 Antes de habilitar operações reais, confira em um Firebase de teste: conta comum e token inválido recebem recusa do BFF; administrador comum não gerencia papéis; revogar acesso impede a requisição seguinte; o navegador não escreve em ranking, auditoria ou comprovantes; a conta proprietária continua comprando e se inscrevendo normalmente. Confira também uma importação de teste com reenvio, pausa/retomada e consulta dos três totais.
 
 Referências: [custom claims e validação no servidor](https://firebase.google.com/docs/auth/admin/custom-claims), [configuração do Admin SDK](https://firebase.google.com/docs/admin/setup) e [transações](https://firebase.google.com/docs/firestore/manage-data/transactions).
+
+## Credenciais em Docker e Vercel
+
+No Docker, use o arquivo adicional `compose.admin.yaml` para montar o JSON informado em `GOOGLE_APPLICATION_CREDENTIALS` apenas no BFF. Veja [Docker](docker.md#administração-com-o-json-local).
+
+Na Vercel, configure `FIREBASE_PROJECT_ID`, `FIREBASE_ADMIN_CLIENT_EMAIL` e `FIREBASE_ADMIN_PRIVATE_KEY` nas variáveis sensíveis do servidor. O email e a chave correspondem a `client_email` e `private_key` do JSON. O servidor aceita quebras de linha reais ou `\n` na chave e rejeita uma configuração incompleta. O projeto precisa corresponder ao Firebase público. Veja [Publicação](deployment.md).
+
+Os arquivos locais e as variáveis de credenciais não são enviados aos microfrontends. O CI e os testes de navegador utilizam dados fictícios e não concedem acessos reais.

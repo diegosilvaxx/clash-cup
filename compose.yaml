@@ -1,0 +1,102 @@
+name: clash-cup
+
+x-build-args: &build-args
+  VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY:-}
+  VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN:-}
+  VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID:-}
+  VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID:-}
+  VITE_SHELL_URL: ${VITE_SHELL_URL:-http://127.0.0.1:5300}
+  VITE_VIP_SUPPORT_URL: ${VITE_VIP_SUPPORT_URL:-https://patreon.com/clashcupbrasil}
+
+x-frontend: &frontend
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+
+services:
+  api:
+    <<: *frontend
+    init: true
+    build:
+      context: .
+      target: api
+      args: *build-args
+    environment:
+      CLASH_ROYALE_API_TOKEN: ${CLASH_ROYALE_API_TOKEN:-}
+      FIREBASE_ADMIN_CLIENT_EMAIL: ${FIREBASE_ADMIN_CLIENT_EMAIL:-}
+      FIREBASE_ADMIN_PRIVATE_KEY: ${FIREBASE_ADMIN_PRIVATE_KEY:-}
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
+      VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID:-}
+    ports:
+      - '127.0.0.1:5400:5400'
+
+  shell:
+    <<: *frontend
+    build:
+      context: .
+      target: frontend
+      args:
+        <<: *build-args
+        APP: shell
+    ports:
+      - '127.0.0.1:5300:8080'
+
+  portal:
+    <<: *frontend
+    build:
+      context: .
+      target: frontend
+      args:
+        <<: *build-args
+        APP: portal
+    ports:
+      - '127.0.0.1:5301:8080'
+
+  auth:
+    <<: *frontend
+    build:
+      context: .
+      target: frontend
+      args:
+        <<: *build-args
+        APP: auth
+    ports:
+      - '127.0.0.1:5302:8080'
+
+  competition:
+    <<: *frontend
+    build:
+      context: .
+      target: frontend
+      args:
+        <<: *build-args
+        APP: competition
+    ports:
+      - '127.0.0.1:5303:8080'
+
+  player:
+    <<: *frontend
+    build:
+      context: .
+      target: frontend
+      args:
+        <<: *build-args
+        APP: player
+    ports:
+      - '127.0.0.1:5304:8080'
+
+  admin:
+    <<: *frontend
+    build:
+      context: .
+      target: frontend
+      args:
+        <<: *build-args
+        APP: admin
+    ports:
+      - '127.0.0.1:5305:8080'

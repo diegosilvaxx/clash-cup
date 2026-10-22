@@ -12,7 +12,7 @@ Portal de torneios de Clash Royale em um monorepo com microfrontends.
 Na raiz do projeto:
 
 ```powershell
-npm install
+npm ci
 ```
 
 Na primeira execução, crie o arquivo de ambiente:
@@ -93,7 +93,35 @@ npm run build
 npm run preview
 ```
 
-A prévia usa as mesmas portas do desenvolvimento. Encerre a execução anterior antes de iniciá-la. O comando `preview` verifica os artefatos localmente; a configuração de hospedagem será tratada na etapa de deploy.
+A prévia usa as mesmas portas do desenvolvimento. Encerre a execução anterior antes de iniciá-la. O comando `preview` verifica os artefatos localmente; a publicação na Vercel utiliza a configuração descrita em [Produção](docs/deployment.md).
+
+## Docker
+
+Com o Docker Desktop aberto, Linux containers habilitados e o `.env` configurado, encerre os servidores Node e execute na raiz:
+
+```powershell
+docker compose up --build --wait
+```
+
+Abra <http://127.0.0.1:5300>. Confira os sete serviços com `docker compose ps` e encerre com `docker compose down`. Não é necessário instalar Node.js no computador para essa execução.
+
+Para utilizar o JSON administrativo já indicado em `GOOGLE_APPLICATION_CREDENTIALS`:
+
+```powershell
+docker compose -f compose.yaml -f compose.admin.yaml up --build --wait
+```
+
+Para iniciar apenas o BFF e o shell:
+
+```powershell
+docker compose up --build --wait api shell
+```
+
+O shell permanece acessível; as áreas cujos remotos não foram iniciados mostram a opção de tentar novamente. Os comandos `up` não param serviços que já estavam ativos. Veja [Docker](docs/docker.md) para acrescentar serviços, configurar credenciais, atualizar variáveis e executar os testes isolados.
+
+## Produção
+
+A configuração `vercel.json` publica os sete serviços em um projeto Vercel, com uma única URL para o portal. Confira [Publicação na Vercel](docs/deployment.md) para variáveis, Firebase e validação dos builds. A integração do Clash Royale exige IP de saída autorizado para o BFF; esse requisito também precisa ser atendido na hospedagem.
 
 ## Estrutura
 
@@ -117,7 +145,8 @@ packages/
 tooling/        Configuração de build e aliases
 scripts/        Inicialização e verificação de arquitetura
 tests/e2e/     Testes do portal integrado e da recuperação
-docs/          Arquitetura e plano de migração
+docker/        Configuração de containers e gateway
+docs/          Arquitetura, migração e execução
 ```
 
 React, React DOM, React Router e styled-components são compartilhados como singletons pelo Module Federation. O shell fornece o layout e o roteador ao conteúdo remoto. O portal também possui uma entrada independente.
@@ -140,7 +169,9 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, perfil, baús, loja, emblemas, ranking, administração, conteúdo público, teclado, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
+Para verificar o formato de publicação, execute `npm run test:vercel`. Para verificar Docker com dados fictícios, encerre os servidores e containers em execução e use `npm run verify:docker`. Os dois comandos estão detalhados na [documentação de entrega](docs/deployment.md).
+
+Os testes E2E geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, perfil, baús, loja, emblemas, ranking, administração, conteúdo público, teclado, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
 
 ## API
 
@@ -173,7 +204,7 @@ Veja os [detalhes do conteúdo público e da navegação](docs/public-portal.md)
 
 ## Migração
 
-Estão implementadas as etapas 1 a 7: fundação, autenticação, competições, área do jogador, loja, ranking, administração com importação de resultados e conteúdo público. A etapa de entrega inclui CI, configuração de produção, Docker e validação em uma cópia limpa. Não há importação automática de dados anteriores.
+As oito etapas abrangem fundação, autenticação, competições, área do jogador, loja, ranking, administração, conteúdo público e entrega. O repositório inclui CI, configuração de produção, Docker e testes dos ambientes de execução. Não há importação automática de dados anteriores.
 
 As [regras de competições](docs/competitions.md#aplicar-as-regras) alteram as permissões do fluxo antigo de torneios. As [regras de loja e ranking](docs/rewards.md#aplicar-as-regras) também restringem as gravações antigas e exigem associação do saldo ao UID. A [administração](docs/administration.md#autorização-e-regras) usa operações autorizadas pelo BFF e mantém os comprovantes privados. Revise a transição e valide as regras em uma base de teste antes de publicá-las no Firebase compartilhado.
 

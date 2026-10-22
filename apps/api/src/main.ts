@@ -16,9 +16,10 @@ export async function startApi(repositoryRoot: string) {
     .max(65535)
     .parse(process.env.CUP_API_PORT || 5400);
   const server = createApiServer(createClashService(process.env.CLASH_ROYALE_API_TOKEN));
+  const host = z.enum(['127.0.0.1', '0.0.0.0']).parse(process.env.CUP_API_HOST || '127.0.0.1');
   await new Promise<void>((resolve, reject) => {
     server.once('error', reject);
-    server.listen(port, '127.0.0.1', resolve);
+    server.listen(port, host, resolve);
   });
   return server;
 }

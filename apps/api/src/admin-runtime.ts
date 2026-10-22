@@ -1,8 +1,21 @@
-import { applicationDefault, getApps, initializeApp } from 'firebase-admin/app';
+import { applicationDefault, cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import type { AdminPrincipal } from '@clash-cup/contracts';
 import { ApiError } from './errors';
+
+function credential(projectId: string) {
+  const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL;
+  const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
+  if (!clientEmail && !privateKey) return applicationDefault();
+  if (!clientEmail || !privateKey)
+    throw new ApiError(
+      503,
+      'ADMIN_NOT_CONFIGURED',
+      'Configure o email e a chave privada do serviço administrativo.',
+    );
+  return cert({ projectId, clientEmail, privateKey: privateKey.replace(/\\n/g, '\n') });
+}
 
 export function adminRuntime() {
   const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -24,7 +37,7 @@ export function adminRuntime() {
     );
   const app =
     getApps().find((item) => item.name === 'clash-cup-admin') ??
-    initializeApp({ projectId, credential: applicationDefault() }, 'clash-cup-admin');
+    initializeApp({ projectId, credential: credential(projectId) }, 'clash-cup-admin');
   return { auth: getAuth(app), database: getFirestore(app) };
 }
 export async function authorizeAdmin(authorization: string | undefined): Promise<AdminPrincipal> {

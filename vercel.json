@@ -1,0 +1,201 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "shell": {
+      "root": ".",
+      "framework": "vite",
+      "installCommand": "npm ci --include=dev --workspaces --include-workspace-root",
+      "buildCommand": "node scripts/build-vercel.mjs shell",
+      "outputDirectory": "dist/vercel/shell",
+      "routes": [
+        {
+          "handle": "filesystem"
+        },
+        {
+          "src": "/.*\\.(?:js|css|json|png|jpe?g|svg|webp|ico|woff2?)$",
+          "status": 404
+        },
+        {
+          "src": "/(.*)",
+          "dest": "/index.html"
+        }
+      ],
+      "devCommand": "node scripts/dev-vercel-service.mjs shell"
+    },
+    "portal": {
+      "root": ".",
+      "framework": "vite",
+      "installCommand": "npm ci --include=dev --workspaces --include-workspace-root",
+      "buildCommand": "node scripts/build-vercel.mjs portal",
+      "outputDirectory": "dist/vercel/portal",
+      "routes": [
+        {
+          "handle": "filesystem"
+        },
+        {
+          "src": "/(.*)",
+          "status": 404
+        }
+      ],
+      "devCommand": "node scripts/dev-vercel-service.mjs portal"
+    },
+    "auth": {
+      "root": ".",
+      "framework": "vite",
+      "installCommand": "npm ci --include=dev --workspaces --include-workspace-root",
+      "buildCommand": "node scripts/build-vercel.mjs auth",
+      "outputDirectory": "dist/vercel/auth",
+      "routes": [
+        {
+          "handle": "filesystem"
+        },
+        {
+          "src": "/(.*)",
+          "status": 404
+        }
+      ],
+      "devCommand": "node scripts/dev-vercel-service.mjs auth"
+    },
+    "competition": {
+      "root": ".",
+      "framework": "vite",
+      "installCommand": "npm ci --include=dev --workspaces --include-workspace-root",
+      "buildCommand": "node scripts/build-vercel.mjs competition",
+      "outputDirectory": "dist/vercel/competition",
+      "routes": [
+        {
+          "handle": "filesystem"
+        },
+        {
+          "src": "/(.*)",
+          "status": 404
+        }
+      ],
+      "devCommand": "node scripts/dev-vercel-service.mjs competition"
+    },
+    "player": {
+      "root": ".",
+      "framework": "vite",
+      "installCommand": "npm ci --include=dev --workspaces --include-workspace-root",
+      "buildCommand": "node scripts/build-vercel.mjs player",
+      "outputDirectory": "dist/vercel/player",
+      "routes": [
+        {
+          "handle": "filesystem"
+        },
+        {
+          "src": "/(.*)",
+          "status": 404
+        }
+      ],
+      "devCommand": "node scripts/dev-vercel-service.mjs player"
+    },
+    "admin": {
+      "root": ".",
+      "framework": "vite",
+      "installCommand": "npm ci --include=dev --workspaces --include-workspace-root",
+      "buildCommand": "node scripts/build-vercel.mjs admin",
+      "outputDirectory": "dist/vercel/admin",
+      "routes": [
+        {
+          "handle": "filesystem"
+        },
+        {
+          "src": "/(.*)",
+          "status": 404
+        }
+      ],
+      "devCommand": "node scripts/dev-vercel-service.mjs admin"
+    },
+    "api": {
+      "root": ".",
+      "entrypoint": "apps/api/src/vercel.ts",
+      "installCommand": "npm ci --include=dev --workspaces --include-workspace-root",
+      "buildCommand": "npm run typecheck",
+      "outputDirectory": ".",
+      "runtime": "node"
+    }
+  },
+  "headers": [
+    {
+      "source": "/runtime-config.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
+      "source": "/remotes/:name/remoteEntry.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
+      "source": "/remotes/:name/mf-manifest.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "api"
+      }
+    },
+    {
+      "source": "/remotes/portal/:path*",
+      "destination": {
+        "service": "portal"
+      }
+    },
+    {
+      "source": "/remotes/auth/:path*",
+      "destination": {
+        "service": "auth"
+      }
+    },
+    {
+      "source": "/remotes/competition/:path*",
+      "destination": {
+        "service": "competition"
+      }
+    },
+    {
+      "source": "/remotes/player/:path*",
+      "destination": {
+        "service": "player"
+      }
+    },
+    {
+      "source": "/remotes/admin/:path*",
+      "destination": {
+        "service": "admin"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "shell"
+      }
+    }
+  ]
+}

@@ -62,9 +62,15 @@ export const tournamentSchema = z
     ),
   })
   .passthrough();
-const remoteUrlSchema = z
-  .url()
-  .refine((url) => ['http:', 'https:'].includes(new URL(url).protocol));
+const remoteUrlSchema = z.string().refine((value) => {
+  if (value.startsWith('/')) return /^\/(?!\/)[^\\\s?#]+\.js$/.test(value);
+  try {
+    const url = new URL(value);
+    return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}, 'Informe uma URL HTTP(S) ou um caminho absoluto para o módulo remoto.');
 export const runtimeConfigSchema = z.object({
   remotes: z.object({
     portal: remoteUrlSchema,

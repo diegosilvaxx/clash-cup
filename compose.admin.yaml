@@ -1,0 +1,11 @@
+services:
+  api:
+    environment:
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase-admin.json
+    volumes:
+      - type: bind
+        source: ${GOOGLE_APPLICATION_CREDENTIALS:?Configure o caminho do JSON no .env}
+        target: /run/secrets/firebase-admin.json
+        read_only: true
+        bind:
+          create_host_path: false

@@ -12,7 +12,7 @@ export async function loadRemoteApp(name: RemoteName, attempt = 0) {
     headers: { 'Cache-Control': 'no-cache' },
   });
   const config = runtimeConfigSchema.parse(response.data);
-  const configuredEntry = new URL(config.remotes[name]).href;
+  const configuredEntry = new URL(config.remotes[name], globalThis.location?.origin).href;
   const registration = registrations.get(name);
   const entry = new URL(
     attempt === 0 && registration?.configuredEntry === configuredEntry

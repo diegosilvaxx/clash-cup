@@ -31,6 +31,11 @@
     "dev:competition": "npm run dev --workspace @clash-cup/competition",
     "dev:player": "npm run dev --workspace @clash-cup/player",
     "dev:admin": "npm run dev --workspace @clash-cup/admin",
+    "build:vercel": "node scripts/build-vercel.mjs",
+    "verify:docker": "node scripts/docker-check.mjs",
+    "test:vercel": "playwright test --config playwright.vercel.config.ts",
+    "test:docker": "node scripts/docker-smoke.mjs",
+    "test:docker:e2e": "playwright test --config playwright.docker.config.ts",
     "admin:role": "node scripts/admin-role.mjs"
   },
   "dependencies": {

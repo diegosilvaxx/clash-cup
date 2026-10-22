@@ -16,14 +16,25 @@ const ports = {
 
 function runtimeConfigPlugin(mode: string): Plugin {
   const env = loadEnv(mode, repositoryRoot, 'CUP_');
+  const container = env.CUP_CONTAINER_BUILD === 'true' || mode === 'vercel';
   const content = JSON.stringify(
     runtimeConfigSchema.parse({
       remotes: {
-        portal: env.CUP_PORTAL_REMOTE_URL || 'http://127.0.0.1:5301/remoteEntry.js',
-        auth: env.CUP_AUTH_REMOTE_URL || 'http://127.0.0.1:5302/remoteEntry.js',
-        competition: env.CUP_COMPETITION_REMOTE_URL || 'http://127.0.0.1:5303/remoteEntry.js',
-        player: env.CUP_PLAYER_REMOTE_URL || 'http://127.0.0.1:5304/remoteEntry.js',
-        admin: env.CUP_ADMIN_REMOTE_URL || 'http://127.0.0.1:5305/remoteEntry.js',
+        portal: container
+          ? '/remotes/portal/remoteEntry.js'
+          : env.CUP_PORTAL_REMOTE_URL || 'http://127.0.0.1:5301/remoteEntry.js',
+        auth: container
+          ? '/remotes/auth/remoteEntry.js'
+          : env.CUP_AUTH_REMOTE_URL || 'http://127.0.0.1:5302/remoteEntry.js',
+        competition: container
+          ? '/remotes/competition/remoteEntry.js'
+          : env.CUP_COMPETITION_REMOTE_URL || 'http://127.0.0.1:5303/remoteEntry.js',
+        player: container
+          ? '/remotes/player/remoteEntry.js'
+          : env.CUP_PLAYER_REMOTE_URL || 'http://127.0.0.1:5304/remoteEntry.js',
+        admin: container
+          ? '/remotes/admin/remoteEntry.js'
+          : env.CUP_ADMIN_REMOTE_URL || 'http://127.0.0.1:5305/remoteEntry.js',
       },
     }),
   );
@@ -45,7 +56,12 @@ function runtimeConfigPlugin(mode: string): Plugin {
 export function createAppConfig(application: keyof typeof ports) {
   return defineConfig(({ mode }) => {
     const apiUrl = loadEnv(mode, repositoryRoot, 'CUP_').CUP_API_URL || 'http://127.0.0.1:5400';
+    const container =
+      loadEnv(mode, repositoryRoot, 'CUP_').CUP_CONTAINER_BUILD === 'true' || mode === 'vercel';
     return {
+      base: container && application !== 'shell' ? `/remotes/${application}/` : '/',
+      define:
+        mode === 'vercel' ? { 'import.meta.env.VITE_SHELL_URL': 'window.location.origin' } : {},
       root: resolve(repositoryRoot, 'apps', application),
       envDir: repositoryRoot,
       plugins: [
@@ -95,7 +111,7 @@ export function createAppConfig(application: keyof typeof ports) {
         host: '127.0.0.1',
         port: ports[application],
         strictPort: true,
-        origin: `http://127.0.0.1:${ports[application]}`,
+        origin: mode === 'vercel' ? '' : `http://127.0.0.1:${ports[application]}`,
         cors: true,
         fs: { allow: [repositoryRoot] },
         proxy: { '/api': { target: apiUrl, changeOrigin: true } },
@@ -109,7 +125,12 @@ export function createAppConfig(application: keyof typeof ports) {
       },
       build: {
         target: 'es2022',
-        outDir: resolve(repositoryRoot, mode === 'e2e' ? 'dist/e2e' : 'dist', application),
+        outDir:
+          mode === 'vercel'
+            ? application === 'shell'
+              ? resolve(repositoryRoot, 'dist/vercel/shell')
+              : resolve(repositoryRoot, 'dist/vercel', application, 'remotes', application)
+            : resolve(repositoryRoot, mode === 'e2e' ? 'dist/e2e' : 'dist', application),
         emptyOutDir: true,
       },
     };

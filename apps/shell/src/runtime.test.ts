@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ registerRemotes: vi.fn(), loadRemote: vi.fn(), get: vi.fn() }));
 vi.mock('@module-federation/runtime', () => ({
@@ -21,7 +21,25 @@ beforeEach(() => {
   mocks.loadRemote.mockResolvedValue({ App: () => null });
 });
 
+afterEach(() => vi.unstubAllGlobals());
 describe('remote recovery', () => {
+  it('resolves gateway entries against the current deployment origin', async () => {
+    vi.stubGlobal('location', { origin: 'https://preview.example.test' });
+    const data = {
+      remotes: Object.fromEntries(
+        ['portal', 'auth', 'competition', 'player', 'admin'].map((name) => [
+          name,
+          `/remotes/${name}/remoteEntry.js`,
+        ]),
+      ),
+    };
+    mocks.get.mockResolvedValue({ data });
+    const { loadPortal } = await import('./runtime');
+    await loadPortal();
+    expect(mocks.registerRemotes.mock.calls[0]?.[0][0].entry).toBe(
+      'https://preview.example.test/remotes/portal/remoteEntry.js',
+    );
+  });
   it('keeps portal and authentication registrations independent', async () => {
     const { loadRemoteApp } = await import('./runtime');
     await loadRemoteApp('portal');
