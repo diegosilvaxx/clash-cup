@@ -150,7 +150,7 @@ export function Imports({ jobs, uid }: { jobs: ImportJob[]; uid: string }) {
           <p>
             {preview.tag} · {preview.month}/{preview.year} · {preview.members.length} jogadores
           </p>
-          <TableFrame>
+          <TableFrame role="region" aria-label="Prévia dos resultados" tabIndex={0}>
             <table>
               <caption>
                 Prévia dos primeiros {Math.min(10, preview.members.length)} jogadores

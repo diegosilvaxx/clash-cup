@@ -21,7 +21,7 @@
     "paths": {
       "@clash-cup/contracts": ["./packages/contracts/src/index.ts"],
       "@clash-cup/http": ["./packages/http/src/index.ts"],
-      "@clash-cup/ui": ["./packages/ui/src/index.tsx"],
+      "@clash-cup/ui": ["./packages/ui/src/index.ts"],
       "@clash-cup/session": ["./packages/session/src/index.ts"],
       "@clash-cup/firebase": ["./packages/firebase/src/index.ts"],
       "@clash-cup/competitions": ["./packages/competitions/src/index.ts"],

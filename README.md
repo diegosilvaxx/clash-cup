@@ -100,7 +100,7 @@ A prévia usa as mesmas portas do desenvolvimento. Encerre a execução anterior
 ```text
 apps/
   shell/        Navegação e carregamento dos microfrontends
-  portal/       Primeiro microfrontend: apresentação pública
+  portal/       Apresentação, dúvidas, contato, apoiadores e privacidade
   auth/         Login, cadastro, vínculo e conta
   competition/  Torneios, inscrições e ranking
   player/       Perfil, baús, VIP, loja e emblemas
@@ -140,7 +140,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, perfil, baús, loja, emblemas, ranking, administração, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
+Os testes geram builds próprios em `dist/e2e` e iniciam e encerram seus servidores; mantenha as portas da tabela livres. Há cenários de desktop e celular para o portal, autenticação, vínculo, torneios, inscrições, perfil, baús, loja, emblemas, ranking, administração, conteúdo público, teclado, execução independente, navegação, proxy da API e recuperação de falhas. Firebase e consultas externas usam respostas simuladas; os cenários automatizados não alteram contas ou dados reais.
 
 ## API
 
@@ -163,9 +163,17 @@ Invoke-RestMethod 'https://api.ipify.org'
 
 As tags aceitam letras e números, com `#` inicial opcional. A tag é normalizada e codificada antes da consulta externa. O cliente deve codificar `#` como `%23` ao montar a query string. O token existe somente no servidor e os erros não expõem a configuração da requisição.
 
+## Conteúdo público
+
+As páginas de início, [regras e dúvidas](http://127.0.0.1:5300/regras), [contato](http://127.0.0.1:5300/contato), [apoiadores](http://127.0.0.1:5300/apoiadores) e [dados e privacidade](http://127.0.0.1:5300/politicas) funcionam sem login. Estão disponíveis no rodapé e também no portal independente. A página Sobre permanece no shell para continuar acessível se o remoto público estiver indisponível.
+
+Para configurar o destino dos links que saem das aplicações independentes para o portal integrado, defina `VITE_SHELL_URL` no `.env` e reinicie o desenvolvimento ou gere outro build. O padrão local é `http://127.0.0.1:5300`.
+
+Veja os [detalhes do conteúdo público e da navegação](docs/public-portal.md).
+
 ## Migração
 
-Estão implementadas as etapas 1 a 6: fundação, autenticação, competições, área do jogador, loja, ranking e administração com importação de resultados. Conteúdo público, acabamento e entrega ficam para as próximas etapas. Não há importação automática de dados anteriores.
+Estão implementadas as etapas 1 a 7: fundação, autenticação, competições, área do jogador, loja, ranking, administração com importação de resultados e conteúdo público. A etapa de entrega inclui CI, configuração de produção, Docker e validação em uma cópia limpa. Não há importação automática de dados anteriores.
 
 As [regras de competições](docs/competitions.md#aplicar-as-regras) alteram as permissões do fluxo antigo de torneios. As [regras de loja e ranking](docs/rewards.md#aplicar-as-regras) também restringem as gravações antigas e exigem associação do saldo ao UID. A [administração](docs/administration.md#autorização-e-regras) usa operações autorizadas pelo BFF e mantém os comprovantes privados. Revise a transição e valide as regras em uma base de teste antes de publicá-las no Firebase compartilhado.
 

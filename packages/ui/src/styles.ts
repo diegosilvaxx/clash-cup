@@ -4,11 +4,11 @@ import styled, { createGlobalStyle } from 'styled-components';
 export const GlobalStyle = createGlobalStyle`
   :root { color-scheme: light; font-family: Inter, system-ui, sans-serif; color: #17284e; background: #f6f8fc; font-synthesis: none; }
   * { box-sizing: border-box; }
-  body { margin: 0; }
+  body { margin: 0; overflow-wrap: break-word; }
   a { color: inherit; }
-  button, input { font: inherit; }
+  button, input, select, textarea { font: inherit; }
   button { cursor: pointer; }
-  img { max-width: 100%; }
+  img { max-width: 100%; height: auto; }
   :focus-visible { outline: 3px solid #96700b; outline-offset: 4px; }
   h1, h2, h3, p { margin-top: 0; }
   p { line-height: 1.7; }
@@ -40,19 +40,31 @@ export const HeaderContent = styled.div`
     font-size: 14px;
   }
   nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
     text-decoration: none;
+  }
+  nav a[aria-current='page'] {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    font-weight: 700;
   }
   @media (max-width: 480px) {
     padding: 16px;
     gap: 12px;
     nav {
       gap: 14px;
-      font-size: 13px;
+      font-size: 14px;
     }
   }
 `;
 export const Brand = styled(Link)`
   font-size: 22px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-weight: 850;
   text-decoration: none;
   letter-spacing: -0.8px;
@@ -62,6 +74,7 @@ export const Brand = styled(Link)`
 `;
 export const Main = styled.main`
   width: 100%;
+  min-width: 0;
   flex: 1;
   &:focus {
     outline: none;
@@ -73,6 +86,21 @@ export const Footer = styled.footer`
   color: #53617b;
   font-size: 13px;
   border-top: 1px solid #e0e6f0;
+  nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-bottom: 16px;
+  }
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  a[aria-current='page'] {
+    font-weight: 750;
+  }
   p {
     margin-bottom: 0;
   }

@@ -11,7 +11,7 @@ export function App() {
       name: 'admin',
       paths: ['/admin', '/admin/torneios', '/admin/saldos', '/admin/resultados', '/admin/acessos'],
     },
-    { name: 'portal', paths: ['/'] },
+    { name: 'portal', paths: ['/', '/regras', '/contato', '/apoiadores', '/politicas'] },
     { name: 'auth', paths: ['/entrar', '/cadastro', '/vincular-jogador', '/minha-conta'] },
     { name: 'competition', paths: ['/torneios', '/torneios/:id', '/meus-torneios', '/ranking'] },
     { name: 'player', paths: ['/perfil', '/baus', '/area-vip', '/loja', '/meus-emblemas'] },

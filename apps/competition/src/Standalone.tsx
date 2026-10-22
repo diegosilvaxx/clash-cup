@@ -1,9 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { PageLayout, Container } from '@clash-cup/ui';
+import { PageLayout, shellUrl, Container } from '@clash-cup/ui';
 import { App } from './App';
 export function Standalone() {
   return (
-    <PageLayout competitionNavigation>
+    <PageLayout publicOrigin={shellUrl()} competitionNavigation>
       <Routes>
         <Route path="/" element={<Navigate replace to="/torneios" />} />
         <Route
@@ -13,7 +13,7 @@ export function Standalone() {
               <h1>Entre pelo portal</h1>
               <p>
                 A aplicação de torneios independente usa uma sessão própria. Para entrar e
-                participar, <a href="http://127.0.0.1:5300/entrar">acesse o portal integrado</a>.
+                participar, <a href={shellUrl('/entrar')}>acesse o portal integrado</a>.
               </p>
             </Container>
           }

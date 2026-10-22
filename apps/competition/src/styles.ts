@@ -6,6 +6,11 @@ export const Navigation = styled.nav`
   gap: 20px;
   margin-bottom: 28px;
   a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  a {
     text-underline-offset: 5px;
   }
 `;

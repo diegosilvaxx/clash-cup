@@ -1,12 +1,13 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { session, useSession } from '@clash-cup/session';
-import { AccountMenu, Container, PageLayout } from '@clash-cup/ui';
+import { AccountMenu, Container, PageLayout, shellUrl } from '@clash-cup/ui';
 import { App } from './App';
 
 export function Standalone() {
   const state = useSession();
   return (
     <PageLayout
+      publicOrigin={shellUrl()}
       accountMenu={
         <AccountMenu
           key={state.user?.uid ?? 'anonymous'}

@@ -12,6 +12,10 @@ vi.mock('./RemoteSlot', () => ({
   RemoteSlot: ({ name }: { name: string }) => (
     <Routes>
       <Route path="/" element={<h1>Portal {name}</h1>} />
+      <Route path="/regras" element={<h1>Regras {name}</h1>} />
+      <Route path="/contato" element={<h1>Contato {name}</h1>} />
+      <Route path="/apoiadores" element={<h1>Apoiadores {name}</h1>} />
+      <Route path="/politicas" element={<h1>Privacidade {name}</h1>} />
       <Route path="/entrar" element={<h1>Login {name}</h1>} />
       <Route path="/perfil" element={<h1>Perfil {name}</h1>} />
       <Route path="/baus" element={<h1>Baús {name}</h1>} />
@@ -36,6 +40,10 @@ afterEach(cleanup);
 describe('shell route composition', () => {
   it.each([
     ['/', 'Portal portal'],
+    ['/regras', 'Regras portal'],
+    ['/contato', 'Contato portal'],
+    ['/apoiadores', 'Apoiadores portal'],
+    ['/politicas', 'Privacidade portal'],
     ['/entrar', 'Login auth'],
     ['/perfil', 'Perfil player'],
     ['/baus', 'Baús player'],

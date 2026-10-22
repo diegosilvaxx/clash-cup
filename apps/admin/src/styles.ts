@@ -4,6 +4,11 @@ export const Navigation = styled.nav`
   flex-wrap: wrap;
   gap: 22px;
   margin-bottom: 28px;
+  a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
   a[aria-current='page'] {
     font-weight: 750;
   }
@@ -15,6 +20,13 @@ export const Panel = styled.section`
   padding: 24px;
   margin: 24px 0;
   overflow-wrap: anywhere;
+  select {
+    max-width: 100%;
+    min-height: 44px;
+  }
+  @media (max-width: 480px) {
+    padding: 16px;
+  }
 `;
 export const Form = styled.form`
   max-width: 720px;

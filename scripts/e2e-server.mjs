@@ -8,6 +8,7 @@ Object.assign(process.env, {
   VITE_FIREBASE_AUTH_DOMAIN: 'demo-clash-cup.firebaseapp.com',
   VITE_FIREBASE_PROJECT_ID: 'demo-clash-cup',
   VITE_FIREBASE_APP_ID: 'test-app-id',
+  VITE_SHELL_URL: 'http://127.0.0.1:5300',
   VITE_VIP_SUPPORT_URL: 'https://www.patreon.com/clashcupbrasil',
   CUP_PLAYER_REMOTE_URL: 'http://127.0.0.1:5304/remoteEntry.js',
   CUP_ADMIN_REMOTE_URL: 'http://127.0.0.1:5305/remoteEntry.js',

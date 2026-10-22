@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useState } from 'react';
 
 const Logout = styled.button`
-  min-height: 36px;
+  min-height: 44px;
   padding: 6px 12px;
   border: 1px solid #c7d2e6;
   border-radius: 8px;

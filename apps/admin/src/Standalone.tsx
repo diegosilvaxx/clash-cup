@@ -1,9 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { Container, PageLayout } from '@clash-cup/ui';
+import { Container, PageLayout, shellUrl } from '@clash-cup/ui';
 import { App } from './App';
 export function Standalone() {
   return (
-    <PageLayout>
+    <PageLayout publicOrigin={shellUrl()}>
       <Routes>
         <Route path="/" element={<Navigate replace to="/admin" />} />
         <Route
@@ -13,7 +13,7 @@ export function Standalone() {
               <h1>Entre pelo portal</h1>
               <p>
                 Para acessar o painel,{' '}
-                <a href="http://127.0.0.1:5300/entrar">continue no portal integrado</a>.
+                <a href={shellUrl('/entrar')}>continue no portal integrado</a>.
               </p>
             </Container>
           }

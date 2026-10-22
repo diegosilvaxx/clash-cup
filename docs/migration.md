@@ -16,15 +16,15 @@ O site PHP consulta tabelas MySQL, enquanto a aplicação React consulta Firesto
 
 ## Divisão planejada
 
-| Aplicação     | Escopo                                                                  | Situação                                                     |
-| ------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `shell`       | Layout, navegação, rotas, carregamento e recuperação dos remotos        | Base implementada                                            |
-| `portal`      | Conteúdo público: apresentação, regras, contato, apoiadores e políticas | Apresentação inicial implementada                            |
-| `auth`        | Login, cadastro, saída e vínculo inicial com jogador                    | Base implementada                                            |
-| `competition` | Torneios, inscrições, meus torneios e ranking                           | Torneios, inscrições e ranking implementados                 |
-| `player`      | Perfil, baús, área VIP, loja e emblemas                                 | Perfil, baús, VIP informativo, loja e emblemas implementados |
-| `admin`       | Administração de torneios, ranking e permissões                         | Implementada                                                 |
-| `api`         | Adaptador para a API oficial e futuras operações de negócio autorizadas | Adaptador inicial implementado                               |
+| Aplicação     | Escopo                                                                  | Situação                                                               |
+| ------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `shell`       | Layout, navegação, rotas, carregamento e recuperação dos remotos        | Base implementada                                                      |
+| `portal`      | Conteúdo público: apresentação, regras, contato, apoiadores e políticas | Apresentação, dúvidas, contato, apoiadores e privacidade implementados |
+| `auth`        | Login, cadastro, saída e vínculo inicial com jogador                    | Base implementada                                                      |
+| `competition` | Torneios, inscrições, meus torneios e ranking                           | Torneios, inscrições e ranking implementados                           |
+| `player`      | Perfil, baús, área VIP, loja e emblemas                                 | Perfil, baús, VIP informativo, loja e emblemas implementados           |
+| `admin`       | Administração de torneios, ranking e permissões                         | Implementada                                                           |
+| `api`         | Adaptador para a API oficial e futuras operações de negócio autorizadas | Adaptador inicial implementado                                         |
 
 Os limites seguem responsabilidades de produto. A API é backend; ela não é um microfrontend. Os pacotes compartilhados devem conter contratos, infraestrutura e elementos reutilizáveis, evitando importar telas ou regras de uma aplicação diretamente em outra.
 
@@ -52,7 +52,7 @@ As ligações tracejadas representam integrações ainda não implementadas.
 4. **Área do jogador (implementada):** remoto `player`, perfil, baús e área VIP. Integrar a API pelo mesmo domínio e cancelar consultas substituídas. Consultas ao abrir e ao atualizar, sem cache próprio nesta etapa. A área VIP preserva o conteúdo informativo do legado; assinaturas e benefícios dependem de integração futura. Veja [Área do jogador](player.md).
 5. **Loja e ranking (implementada):** saldo, emblemas, histórico e ranking. Compras atômicas e verificação de preço/propriedade nas regras; saldos antigos exigem associação administrativa ao UID. Veja [Loja, emblemas e ranking](rewards.md).
 6. **Administração (implementada):** remoto `admin`, gestão de torneios, associação de saldos, importação idempotente de resultados e gestão de acessos pelo responsável. O BFF verifica o token e o papel atual da conta; permissões usam custom claims em vez de emails fixos ou documentos do legado. Consulte [Administração](administration.md).
-7. **Conteúdo público e acabamento:** migrar regras, políticas, contato e apoiadores; confirmar os destinos atuais dos links; revisar responsividade, acessibilidade e identidade visual. Formulários só devem aparecer como funcionais quando houver tratamento de envio.
+7. **Conteúdo público e acabamento (implementada):** apresentação, regras e dúvidas, contato, apoiadores e dados e privacidade, com destinos confirmados e conteúdo ajustado às funcionalidades atuais. Navegação com indicação da página ativa, títulos e foco acompanhando as rotas; perguntas por teclado e leitura em telas estreitas. O contato usa email e grupo, sem formulário de envio. Veja [Portal público](public-portal.md).
 8. **Entrega:** testes completos, CI, documentação, configuração de produção e Docker. Validar a execução a partir de uma cópia limpa e conferir a conectividade real da API oficial no ambiente escolhido.
 
 Cada etapa termina com verificações e um conjunto de alterações para revisão e commit antes da próxima.

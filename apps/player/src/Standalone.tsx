@@ -1,9 +1,9 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { Container, PageLayout } from '@clash-cup/ui';
+import { Container, PageLayout, shellUrl } from '@clash-cup/ui';
 import { App } from './App';
 export function Standalone() {
   return (
-    <PageLayout playerNavigation>
+    <PageLayout publicOrigin={shellUrl()} playerNavigation>
       <Routes>
         <Route path="/" element={<Navigate replace to="/area-vip" />} />
         {['/entrar', '/vincular-jogador'].map((path) => (
@@ -15,7 +15,7 @@ export function Standalone() {
                 <h1>Acesse sua conta pelo portal</h1>
                 <p>
                   Para consultar seu perfil, seus baús e seus emblemas,{' '}
-                  <a href={`http://127.0.0.1:5300${path}`}>continue no portal integrado</a>.
+                  <a href={shellUrl(path)}>continue no portal integrado</a>.
                 </p>
               </Container>
             }
