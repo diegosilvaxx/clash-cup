@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+playwright-report/
+test-results/
+**/__mf__virtual/
+.env
+.env.*
+!.env.example
+.vercel/
+*.log
+.DS_Store
+Thumbs.db
