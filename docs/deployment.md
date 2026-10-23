@@ -4,7 +4,7 @@
 
 O `vercel.json` define sete Services: `shell`, `portal`, `auth`, `competition`, `player`, `admin` e `api`. O projeto tem uma única URL pública. Os módulos ficam em `/remotes/<nome>/` e o BFF em `/api/`; as demais rotas seguem para o shell.
 
-Cada serviço tem instalação, build e diretório de saída definidos. As dependências de desenvolvimento são instaladas explicitamente, pois TypeScript e Vite são necessários durante o build. Os caminhos dos módulos são relativos à origem do deploy, funcionando também em URLs de preview. O BFF exporta um servidor HTTP; a plataforma gerencia a porta e as requisições.
+Cada serviço tem instalação, build e diretório de saída definidos. As dependências de desenvolvimento são instaladas explicitamente, pois TypeScript e Vite são necessários durante o build. Os caminhos dos módulos são relativos à origem do deploy, funcionando também em URLs de preview. O BFF exporta um handler HTTP chamável, sem abrir uma porta; a plataforma gerencia o servidor e as requisições. A inicialização local e Docker envolve esse mesmo handler em um servidor Node.
 
 Essa configuração segue o modelo atual de [Vercel Services](https://vercel.com/kb/guide/vercel-services). Serviços no mesmo projeto são publicados juntos. O Docker é uma opção local e não é enviado à Vercel.
 
@@ -24,7 +24,7 @@ Os [bindings da Vercel](https://vercel.com/docs/services/bindings) aplicam-se a 
 
 Todos os sete serviços possuem uma rota pública. O remoto `admin` expõe os arquivos da interface; acesso aos dados e operações continua protegido no BFF. Os nomes `api:5400` e `<remoto>:8080` pertencem somente à rede Docker, e as portas 5300–5400 são padrões de desenvolvimento. Nenhum deles é utilizado para descobrir serviços no deploy Vercel.
 
-Os serviços mantêm `root: "."` para instalar os workspaces pelo lockfile da raiz; os comandos selecionam a aplicação correta. O backend usa `runtime: "node"` e o entrypoint HTTP específico da Vercel.
+Os serviços mantêm `root: "."` para instalar os workspaces pelo lockfile da raiz; os comandos selecionam a aplicação correta. O backend usa `runtime: "node"` e o entrypoint HTTP específico da Vercel, exportando uma função `(request, response)`.
 
 ## Configurar o projeto
 

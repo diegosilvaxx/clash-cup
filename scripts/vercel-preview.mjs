@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseEnv } from 'node:util';
 import { preview } from 'vite';
+import { createServer } from 'node:http';
 
 // Local integration test for the deployment artifacts; this does not emulate Vercel's infrastructure.
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -30,7 +31,11 @@ async function close(code = 0) {
 process.once('SIGINT', () => void close());
 process.once('SIGTERM', () => void close());
 try {
-  api = (await import(pathToFileURL(resolve(root, 'dist/vercel/api/vercel.js')).href)).default;
+  const handler = (await import(pathToFileURL(resolve(root, 'dist/vercel/api/vercel.js')).href))
+    .default;
+  if (typeof handler !== 'function')
+    throw new Error('O entrypoint Vercel precisa exportar um handler HTTP.');
+  api = createServer(handler);
   await new Promise((resolve, reject) => {
     api.once('error', reject);
     api.listen(5400, '127.0.0.1', resolve);

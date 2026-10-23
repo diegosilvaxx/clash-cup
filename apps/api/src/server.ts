@@ -9,6 +9,24 @@ import { createAdminService } from './admin-service';
 export async function readJson(req: IncomingMessage) {
   if (!/^application\/json(?:;|$)/i.test(req.headers['content-type'] ?? ''))
     throw new ApiError(415, 'INVALID_CONTENT_TYPE', 'Envie os dados em JSON.');
+  if (Number(req.headers['content-length']) > 16384)
+    throw new ApiError(413, 'BODY_TOO_LARGE', 'Os dados excedem o tamanho permitido.');
+  // Some function runtimes parse JSON before invoking the Node handler.
+  if ('body' in req) {
+    let body: unknown;
+    let serialized: string | undefined;
+    try {
+      body = req.body;
+      serialized = JSON.stringify(body);
+    } catch {
+      throw new ApiError(400, 'INVALID_JSON', 'Envie um JSON válido.');
+    }
+    if (serialized !== undefined) {
+      if (Buffer.byteLength(serialized) > 16384)
+        throw new ApiError(413, 'BODY_TOO_LARGE', 'Os dados excedem o tamanho permitido.');
+      return body;
+    }
+  }
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of req) {
@@ -35,11 +53,11 @@ function send(res: ServerResponse, status: number, body: unknown) {
   res.end(JSON.stringify(body));
 }
 
-export function createApiServer(
+export function createApiHandler(
   service: ClashService,
   admin = createAdminHandler(createAdminService(service)),
 ) {
-  return createServer(async (req, res) => {
+  return async (req: IncomingMessage, res: ServerResponse) => {
     let administrative = false;
     const controller = new AbortController();
     req.once('aborted', () => controller.abort());
@@ -118,5 +136,12 @@ export function createApiServer(
               );
       send(res, failure.status, { error: { code: failure.code, message: failure.message } });
     }
-  });
+  };
+}
+
+export function createApiServer(
+  service: ClashService,
+  admin?: ReturnType<typeof createAdminHandler>,
+) {
+  return createServer(createApiHandler(service, admin));
 }

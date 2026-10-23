@@ -1,5 +1,5 @@
 import { createClashService } from './clash-client';
-import { createApiServer } from './server';
+import { createApiHandler } from './server';
 
-// Vercel owns the listener; this entry must not call listen() or load a local .env.
-export default createApiServer(createClashService(process.env.CLASH_ROYALE_API_TOKEN));
+// Vercel invokes the handler directly; the local and Docker entries own their HTTP servers.
+export default createApiHandler(createClashService(process.env.CLASH_ROYALE_API_TOKEN));
