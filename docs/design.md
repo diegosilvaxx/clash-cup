@@ -11,3 +11,5 @@ As artes locais em `packages/ui/src/assets` foram reaproveitadas dos repositóri
 No build, os endereços das imagens importadas pelo JavaScript são relativos ao próprio módulo. Isso preserva a origem do remoto nos previews com portas separadas e o prefixo `/remotes/<nome>/` na publicação. A configuração usa as [opções de URLs de assets do Vite](https://vite.dev/guide/build#advanced-base-options).
 
 `tests/e2e/layout.spec.ts` verifica imagens, dados reais dos repositórios com fixtures isoladas, navegação, fechamento por teclado e ausência de rolagem horizontal em 320, 360, 768 e 1440px. As capturas de referência são salvas nos artefatos dos testes.
+
+A listagem de torneios limita cada card a 400px, mantendo a largura disponível em telas menores. As páginas têm uma entrada suave; cards e botões respondem ao cursor e ao clique com movimentos curtos. As animações respeitam `prefers-reduced-motion` e os efeitos de elevação ficam restritos a dispositivos com hover.

@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { buttonStyle } from '@clash-cup/ui';
 
 export const Navigation = styled.nav`
   display: flex;
@@ -20,8 +21,9 @@ export const Navigation = styled.nav`
 `;
 export const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 400px));
   gap: 20px;
+  align-items: stretch;
 `;
 export const Card = styled.article`
   border: 1px solid var(--cup-border);
@@ -44,17 +46,7 @@ export const Actions = styled.div`
   margin: 24px 0;
 `;
 export const Button = styled.button`
-  min-height: 44px;
-  padding: 10px 18px;
-  border: 0;
-  border-radius: 9px;
-  background: #1474e4;
-  color: white;
-  font-weight: 650;
-  &:disabled {
-    opacity: 0.6;
-    cursor: default;
-  }
+  ${buttonStyle}
 `;
 export const Feedback = styled.p`
   padding: 16px;

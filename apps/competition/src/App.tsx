@@ -9,6 +9,7 @@ import {
 } from '@clash-cup/competitions';
 import { Container, TournamentTile } from '@clash-cup/ui';
 import { Ranking } from './Ranking';
+import { Championships } from './Championships';
 import { useCompetitionData } from './useCompetitionData';
 import { Actions, Button, Card, Feedback, Grid, Navigation } from './styles';
 
@@ -203,6 +204,7 @@ function CompetitionContent() {
       <Navigation aria-label="Competições">
         <Link to="/torneios">Todos os torneios</Link>
         <Link to="/meus-torneios">Minhas inscrições</Link>
+        <Link to="/meus-campeonatos">Meus campeonatos</Link>
       </Navigation>
       {result.loading && !result.data ? (
         <p role="status">Carregando torneios…</p>
@@ -282,5 +284,7 @@ function CompetitionContent() {
 }
 export function App() {
   const { pathname } = useLocation();
+  if (pathname === '/meus-campeonatos' || pathname.startsWith('/campeonatos/'))
+    return <Championships />;
   return pathname === '/ranking' ? <Ranking /> : <CompetitionContent />;
 }

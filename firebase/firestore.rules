@@ -5,7 +5,41 @@ service cloud.firestore {
     // Collections not yet migrated keep their legacy policy.
     match /{collection}/{document=**} {
       allow read, write: if request.auth != null
-        && !(collection in ['playerProfiles', 'tournament', 'myTournament', 'competitionRegistrations', 'shop', 'ranking', 'rankingHistory', 'resultImports', 'adminAudit', 'admins']);
+        && !(collection in ['playerProfiles', 'tournament', 'myTournament', 'competitionRegistrations', 'shop', 'ranking', 'rankingHistory', 'resultImports', 'adminAudit', 'admins', 'communityChampionships']);
+    }
+
+    match /communityChampionships/{id} {
+      function ownsChampionship() {
+        return request.auth != null && resource.data.ownerUid == request.auth.uid;
+      }
+      function validChampionship() {
+        let data = request.resource.data;
+        return data.keys().hasOnly(['name', 'description', 'size', 'players', 'startsAt', 'bestOf', 'thirdPlace', 'cover', 'status', 'scores', 'ownerUid', 'revision', 'updatedAt'])
+          && data.keys().hasAll(['name', 'description', 'size', 'players', 'startsAt', 'bestOf', 'thirdPlace', 'cover', 'status', 'scores', 'ownerUid', 'revision', 'updatedAt'])
+          && data.name is string && data.name.size() >= 3 && data.name.size() <= 80
+          && data.description is string && data.description.size() <= 1000
+          && data.size in [8, 16, 32]
+          && data.players is list && data.players.size() == data.size
+          && data.startsAt is string && data.startsAt.size() <= 40
+          && data.bestOf in [1, 3, 5] && data.thirdPlace is bool
+          && data.cover is string && data.cover.size() <= 200000
+          && (data.cover == '' || data.cover.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$'))
+          && data.status in ['draft', 'published']
+          && data.scores is map && data.scores.size() <= 32
+          && (data.status != 'draft' || data.scores.size() == 0)
+          && data.ownerUid == request.auth.uid
+          && data.revision is int && data.revision > 0
+          && data.updatedAt == request.time;
+      }
+      allow get: if (request.auth != null && !exists(/databases/$(database)/documents/communityChampionships/$(id)))
+        || resource.data.status == 'published' || ownsChampionship();
+      allow list: if ownsChampionship();
+      allow create: if request.auth != null && validChampionship() && request.resource.data.revision == 1;
+      allow update: if ownsChampionship() && validChampionship()
+        && request.resource.data.revision == resource.data.revision + 1
+        && (resource.data.status == 'draft'
+          || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['scores', 'revision', 'updatedAt']));
+      allow delete: if false;
     }
 
     match /playerProfiles/{uid} {

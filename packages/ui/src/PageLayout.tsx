@@ -34,6 +34,8 @@ const sections: Record<string, string> = {
   '': 'Início',
   torneios: 'Torneios',
   ranking: 'Ranking',
+  campeonatos: 'Campeonatos',
+  'meus-campeonatos': 'Meus campeonatos',
   'meus-torneios': 'Meus torneios',
   perfil: 'Meu perfil',
   baus: 'Próximos baús',
@@ -170,6 +172,9 @@ export function PageLayout({
               </MenuLink>
               <MenuLink to="/ranking" icon="ranking">
                 Ranking
+              </MenuLink>
+              <MenuLink to="/meus-campeonatos" icon="trophy">
+                Meus campeonatos
               </MenuLink>
               <MenuLink to="/meus-torneios" icon="calendar">
                 Meus torneios

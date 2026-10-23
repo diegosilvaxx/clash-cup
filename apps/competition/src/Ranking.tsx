@@ -174,7 +174,9 @@ export function Ranking() {
                 Os emblemas estão temporariamente indisponíveis. A pontuação continua disponível.
               </Feedback>
             )}
-            <Button onClick={() => setRevision((value) => value + 1)}>Atualizar ranking</Button>
+            <Actions>
+              <Button onClick={() => setRevision((value) => value + 1)}>Atualizar ranking</Button>
+            </Actions>
             {calculationError ? (
               <Feedback role="alert">{calculationError}</Feedback>
             ) : rows.length === 0 ? (

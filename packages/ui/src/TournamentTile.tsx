@@ -10,11 +10,20 @@ const Tile = styled.article`
   flex-direction: column;
   min-width: 0;
   transition:
-    border-color 0.15s,
-    transform 0.15s;
+    border-color 0.2s,
+    transform 0.2s,
+    box-shadow 0.2s;
   &:hover {
     border-color: #4682bd;
-    transform: translateY(-2px);
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px #02081466;
+    }
+    &:hover img {
+      transform: scale(1.04);
+    }
   }
 `;
 const Cover = styled.div`
@@ -26,6 +35,7 @@ const Cover = styled.div`
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.35s ease;
     object-position: center 45%;
   }
   &::after {

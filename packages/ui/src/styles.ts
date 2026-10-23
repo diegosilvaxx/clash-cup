@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import styled, { createGlobalStyle, css } from 'styled-components';
+import styled, { createGlobalStyle, css, keyframes } from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
   :root {
@@ -39,6 +39,11 @@ export const GlobalStyle = createGlobalStyle`
   input:disabled, select:disabled, textarea:disabled { opacity: .65; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
 `;
+const enterPage = keyframes`
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
+
 export const surface = css`
   background: linear-gradient(145deg, #11223c, #0d192d);
   border: 1px solid var(--cup-border);
@@ -64,10 +69,25 @@ export const buttonStyle = css`
   line-height: 1.35;
   transition:
     filter 0.15s,
-    border-color 0.15s;
+    border-color 0.15s,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
   &:hover:not(:disabled) {
     color: white;
     filter: brightness(1.15);
+  }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow:
+        inset 0 1px 0 #ffffff29,
+        0 7px 20px #0054ca40;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    &:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+    }
   }
   &:disabled {
     opacity: 0.5;
@@ -115,7 +135,10 @@ export const Sidebar = styled.aside<{ $open: boolean }>`
     font-size: 0.9rem;
     text-decoration: none;
     color: #c7d7ed;
-    transition: background 0.15s;
+    transition:
+      background 0.18s,
+      color 0.18s,
+      border-color 0.18s;
   }
   nav a:hover {
     color: white;
@@ -337,6 +360,7 @@ export const SkipLink = styled.a`
   }
 `;
 export const Container = styled.div`
+  animation: ${enterPage} 0.32s ease-out;
   max-width: 1480px;
   min-width: 0;
   width: 100%;

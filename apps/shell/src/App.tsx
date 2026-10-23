@@ -13,7 +13,19 @@ export function App() {
     },
     { name: 'portal', paths: ['/', '/regras', '/contato', '/apoiadores', '/politicas'] },
     { name: 'auth', paths: ['/entrar', '/cadastro', '/vincular-jogador', '/minha-conta'] },
-    { name: 'competition', paths: ['/torneios', '/torneios/:id', '/meus-torneios', '/ranking'] },
+    {
+      name: 'competition',
+      paths: [
+        '/torneios',
+        '/torneios/:id',
+        '/meus-torneios',
+        '/ranking',
+        '/meus-campeonatos',
+        '/campeonatos/novo',
+        '/campeonatos/:id',
+        '/campeonatos/:id/editar',
+      ],
+    },
     { name: 'player', paths: ['/perfil', '/baus', '/area-vip', '/loja', '/meus-emblemas'] },
   ] as const;
   const remote = remotes.find(({ paths }) => paths.some((path) => matchPath(path, pathname)))?.name;

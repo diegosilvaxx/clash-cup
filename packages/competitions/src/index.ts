@@ -180,3 +180,6 @@ export function createCompetitionRepository(
   };
 }
 export const competitions = createCompetitionRepository();
+
+export * from './championship-model';
+export { championships } from './championship-repository';

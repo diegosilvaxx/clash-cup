@@ -81,6 +81,8 @@ O shell depende do portal para exibir a página inicial. Se o portal estiver par
 
 As telas de conta dependem do remoto `auth`. Shell e remoto compartilham a sessão no portal integrado; aplicações em portas diferentes mantêm sessões independentes.
 
+A área [Meus campeonatos](docs/championships.md) permite criar chaves de 8, 16 ou 32 jogadores, registrar placares e compartilhar uma arte em JPG. Para salvar e compartilhar, publique as regras do Firestore indicadas nessa documentação.
+
 As rotas de torneios usam o remoto `competition`. Veja [torneios e inscrições](docs/competitions.md) para dados, regras e compatibilidade com inscrições antigas.
 
 A [área do jogador](docs/player.md) oferece perfil e próximos baús pelo BFF, além da página informativa de apoio VIP. A [loja e o ranking](docs/rewards.md) adicionam saldo, coleção de emblemas e consulta ao histórico. Para comprar, o saldo precisa estar associado à conta pela organização e as regras desta etapa precisam estar publicadas.
