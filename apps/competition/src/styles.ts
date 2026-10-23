@@ -5,10 +5,14 @@ export const Navigation = styled.nav`
   flex-wrap: wrap;
   gap: 20px;
   margin-bottom: 28px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--cup-border);
   a {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
+    text-decoration: none;
+    color: #8fcaff;
   }
   a {
     text-underline-offset: 5px;
@@ -20,10 +24,10 @@ export const Grid = styled.div`
   gap: 20px;
 `;
 export const Card = styled.article`
-  border: 1px solid #dbe2ee;
+  border: 1px solid var(--cup-border);
   border-radius: 16px;
   padding: 24px;
-  background: white;
+  background: var(--cup-panel);
   overflow-wrap: anywhere;
   h2 {
     font-size: 22px;
@@ -44,7 +48,7 @@ export const Button = styled.button`
   padding: 10px 18px;
   border: 0;
   border-radius: 9px;
-  background: #253d74;
+  background: #1474e4;
   color: white;
   font-weight: 650;
   &:disabled {
@@ -54,7 +58,7 @@ export const Button = styled.button`
 `;
 export const Feedback = styled.p`
   padding: 16px;
-  border: 1px solid #dbe2ee;
+  border: 1px solid var(--cup-border);
   border-radius: 10px;
-  background: #fff;
+  background: var(--cup-panel);
 `;

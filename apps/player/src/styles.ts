@@ -4,6 +4,8 @@ export const Navigation = styled.nav`
   flex-wrap: wrap;
   gap: 22px;
   margin-bottom: 28px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--cup-border);
   a {
     display: inline-flex;
     align-items: center;
@@ -14,13 +16,15 @@ export const Navigation = styled.nav`
   }
   a[aria-current='page'] {
     font-weight: 750;
+    color: #72c6ff;
   }
 `;
 export const Panel = styled.section`
   padding: 28px;
-  border: 1px solid #dbe2ee;
+  border: 1px solid var(--cup-border);
   border-radius: 18px;
-  background: #fff;
+  background: var(--cup-panel);
+  box-shadow: 0 8px 30px #00000012;
   overflow-wrap: anywhere;
   @media (max-width: 480px) {
     padding: 22px 16px;
@@ -32,7 +36,7 @@ export const Stats = styled.dl`
   gap: 24px;
   margin: 28px 0;
   dt {
-    color: #53617b;
+    color: var(--cup-muted);
     font-size: 14px;
     margin-bottom: 8px;
   }
@@ -50,6 +54,10 @@ export const Deck = styled.ul`
   gap: 16px;
   li {
     display: grid;
+    background: #14253c;
+    border: 1px solid var(--cup-border);
+    border-radius: 12px;
+    padding: 16px 10px;
     align-content: start;
     justify-items: center;
     gap: 10px;
@@ -66,7 +74,7 @@ export const ChestList = styled.ol`
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 16px;
   li {
-    border: 1px solid #dbe2ee;
+    border: 1px solid var(--cup-border);
     border-radius: 12px;
     padding: 20px;
   }
@@ -79,7 +87,7 @@ export const Button = styled.button`
   min-height: 44px;
   padding: 10px 18px;
   margin: 12px 0;
-  background: #253d74;
+  background: #1474e4;
   color: white;
   border: 0;
   border-radius: 9px;
@@ -99,9 +107,9 @@ export const EmblemGrid = styled.ul`
   margin-top: 24px;
   li {
     padding: 20px;
-    border: 1px solid #dbe2ee;
+    border: 1px solid var(--cup-border);
     border-radius: 16px;
-    background: white;
+    background: var(--cup-panel);
     text-align: center;
   }
   img {

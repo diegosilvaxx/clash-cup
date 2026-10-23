@@ -16,6 +16,15 @@ test('buys once, equips a free item and preserves ownership across navigation an
   await signIn(page);
   await page.goto('/loja');
   await expect(page.getByRole('heading', { name: 'Seu saldo: 10 Gold' })).toBeVisible();
+  const emblemImage = page
+    .getByRole('list', { name: 'Catálogo de emblemas' })
+    .locator('img')
+    .first();
+  await expect
+    .poll(() =>
+      emblemImage.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0),
+    )
+    .toBe(true);
   await page.getByRole('button', { name: 'Adquirir: Princesa zangada' }).click();
   await expect(page.getByRole('status')).toContainText('Emblema adquirido e equipado.');
   expect(fixture.competition.getGold()).toBe(0);
@@ -23,7 +32,10 @@ test('buys once, equips a free item and preserves ownership across navigation an
   await page.getByRole('button', { name: 'Adquirir: Goblin malabarista' }).click();
   await expect(page.getByRole('button', { name: 'Equipado: Goblin malabarista' })).toBeDisabled();
   expect(fixture.competition.getOwned()).toEqual(['angry', 'juggling']);
-  await page.getByRole('link', { name: 'Meus emblemas', exact: true }).click();
+  await page
+    .getByRole('navigation', { name: 'Área do jogador' })
+    .getByRole('link', { name: 'Meus emblemas', exact: true })
+    .click();
   await page.getByRole('button', { name: 'Equipar: Princesa zangada' }).click();
   await expect(page.getByRole('status')).toContainText('Emblema equipado.');
   await page.reload();

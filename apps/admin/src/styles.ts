@@ -4,6 +4,8 @@ export const Navigation = styled.nav`
   flex-wrap: wrap;
   gap: 22px;
   margin-bottom: 28px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--cup-border);
   a {
     display: inline-flex;
     align-items: center;
@@ -11,11 +13,12 @@ export const Navigation = styled.nav`
   }
   a[aria-current='page'] {
     font-weight: 750;
+    color: #72c6ff;
   }
 `;
 export const Panel = styled.section`
-  background: white;
-  border: 1px solid #dbe2ee;
+  background: var(--cup-panel);
+  border: 1px solid var(--cup-border);
   border-radius: 16px;
   padding: 24px;
   margin: 24px 0;
@@ -47,9 +50,9 @@ export const Form = styled.form`
     width: 100%;
     min-height: 44px;
     padding: 10px 12px;
-    background: white;
+    background: var(--cup-panel);
     color: inherit;
-    border: 1px solid #aab8cf;
+    border: 1px solid #476185;
     border-radius: 8px;
   }
   textarea {
@@ -72,7 +75,7 @@ export const Button = styled.button`
   padding: 10px 18px;
   border: 0;
   border-radius: 9px;
-  background: #253d74;
+  background: #1474e4;
   color: white;
   font-weight: 650;
   margin: 10px 12px 10px 0;
@@ -88,12 +91,15 @@ export const TableFrame = styled.div`
     border-collapse: collapse;
     width: 100%;
     text-align: left;
-    background: white;
+    background: var(--cup-panel);
   }
   th,
   td {
     padding: 14px;
-    border-bottom: 1px solid #dbe2ee;
+    border-bottom: 1px solid var(--cup-border);
+  }
+  tbody tr:hover {
+    background: var(--cup-panel-raised);
   }
   caption {
     text-align: left;

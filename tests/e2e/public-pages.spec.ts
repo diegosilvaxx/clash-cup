@@ -1,3 +1,4 @@
+import { navigateFromMenu } from './navigation';
 import { expect, test } from '@playwright/test';
 
 test('navigates public pages, supports keyboard questions and reloads deep links', async ({
@@ -5,7 +6,7 @@ test('navigates public pages, supports keyboard questions and reloads deep links
 }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
-    'Seu próximo desafio começa aqui.',
+    'Entre na arena. Conquiste seu lugar.',
   );
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Pular para o conteúdo' })).toBeFocused();
@@ -78,7 +79,7 @@ test('opens public content independently and returns other applications to the h
     'rel',
     'noopener noreferrer',
   );
-  await page.getByRole('link', { name: 'Início', exact: true }).click();
+  await navigateFromMenu(page, 'Início');
   await expect(page.getByRole('link', { name: 'Explorar torneios' })).toHaveAttribute(
     'href',
     'http://127.0.0.1:5300/torneios',

@@ -8,6 +8,8 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@clash-cup/competitions": "0.1.0",
+    "@clash-cup/rewards": "0.1.0",
     "@clash-cup/ui": "0.1.0"
   }
 }

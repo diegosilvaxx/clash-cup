@@ -1,3 +1,4 @@
+import { navigateFromMenu } from './navigation';
 import { expect, test, type Page } from '@playwright/test';
 import { mockFirebase } from './firebase-fixture';
 async function signIn(page: Page) {
@@ -102,13 +103,13 @@ test('isolates an unavailable player remote and preserves recovery during naviga
   await expect(
     page.getByRole('heading', { name: 'Não foi possível carregar a área do jogador.' }),
   ).toBeVisible();
-  await page.getByRole('link', { name: 'Sobre', exact: true }).click();
+  await navigateFromMenu(page, 'Sobre');
   await expect(page.getByRole('heading', { name: 'Sobre a Clash Cup' })).toBeVisible();
   await page.unroute('http://127.0.0.1:5304/**');
-  await page.getByRole('link', { name: 'Área do jogador', exact: true }).click();
+  await navigateFromMenu(page, 'Meu perfil');
   await page.getByRole('button', { name: 'Tentar novamente' }).click();
   await expect(page.getByRole('heading', { name: 'Jogador de teste' })).toBeVisible();
-  await page.getByRole('link', { name: 'Sobre', exact: true }).click();
-  await page.getByRole('link', { name: 'Área do jogador', exact: true }).click();
+  await navigateFromMenu(page, 'Sobre');
+  await navigateFromMenu(page, 'Meu perfil');
   await expect(page.getByRole('heading', { name: 'Jogador de teste' })).toBeVisible();
 });

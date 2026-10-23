@@ -3,10 +3,12 @@ import styled from 'styled-components';
 export const Card = styled.section`
   max-width: 480px;
   margin: 0 auto;
-  background: white;
-  border: 1px solid #dfe5f0;
+  background: var(--cup-panel);
+  border: 1px solid var(--cup-border);
   border-radius: 18px;
   padding: 32px;
+  border-top: 3px solid #168dff;
+  box-shadow: 0 16px 70px #0004;
   h1 {
     font-size: 30px;
     letter-spacing: -1px;
@@ -38,18 +40,18 @@ export const Field = styled.div`
   input {
     width: 100%;
     min-height: 46px;
-    border: 1px solid #a9b6cf;
+    border: 1px solid #476185;
     border-radius: 8px;
     padding: 10px 12px;
-    background: #fff;
-    color: #17284e;
+    background: var(--cup-panel);
+    color: var(--cup-text);
   }
   input[aria-invalid='true'] {
-    border-color: #ac2323;
+    border-color: var(--cup-danger);
   }
   small {
     font-size: 13px;
-    color: #53617b;
+    color: var(--cup-muted);
   }
 `;
 export const Button = styled.button`
@@ -58,7 +60,7 @@ export const Button = styled.button`
   border: 0;
   border-radius: 9px;
   color: white;
-  background: #253d74;
+  background: #1474e4;
   font-weight: 650;
   &:disabled {
     opacity: 0.6;
@@ -67,12 +69,12 @@ export const Button = styled.button`
 `;
 export const GoogleButton = styled(Button)`
   width: 100%;
-  color: #253d74;
-  background: white;
-  border: 1px solid #a9b6cf;
+  color: var(--cup-text);
+  background: var(--cup-panel);
+  border: 1px solid #476185;
 `;
 export const ErrorText = styled.p`
-  color: #ac2323;
+  color: var(--cup-danger);
   font-size: 14px;
   margin: 0;
 `;
@@ -81,7 +83,7 @@ export const DefinitionList = styled.dl`
   gap: 8px;
   dt {
     font-size: 13px;
-    color: #53617b;
+    color: var(--cup-muted);
   }
   dd {
     margin: 0 0 14px;

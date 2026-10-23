@@ -21,8 +21,8 @@ export const ReadingPage = styled(Container)`
   }
 `;
 export const Panel = styled.section`
-  background: white;
-  border: 1px solid #dfe5f0;
+  background: var(--cup-panel);
+  border: 1px solid var(--cup-border);
   border-radius: 16px;
   padding: 24px;
   margin: 24px 0;
@@ -38,8 +38,8 @@ export const Panel = styled.section`
 `;
 export const Questions = styled.div`
   details {
-    border: 1px solid #dfe5f0;
-    background: white;
+    border: 1px solid var(--cup-border);
+    background: var(--cup-panel);
     border-radius: 12px;
     margin: 14px 0;
     padding: 0 20px;
@@ -61,9 +61,9 @@ export const SupportersGrid = styled.div`
   gap: 20px;
   margin: 32px 0;
   article {
-    background: white;
+    background: var(--cup-panel);
     padding: 24px;
-    border: 1px solid #dfe5f0;
+    border: 1px solid var(--cup-border);
     border-radius: 16px;
     text-align: center;
   }

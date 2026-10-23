@@ -2,8 +2,16 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { App } from './App';
+vi.mock('./useHighlights', () => ({
+  useHighlights: () => ({
+    tournaments: { status: 'ready', data: [] },
+    ranking: { status: 'ready', data: null },
+    leaders: [],
+    retry: vi.fn(),
+  }),
+}));
 
 afterEach(cleanup);
 describe('public portal', () => {

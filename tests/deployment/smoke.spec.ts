@@ -1,3 +1,4 @@
+import { navigateFromMenu } from '../e2e/navigation';
 import { expect, test } from '@playwright/test';
 import { mockFirebase } from '../e2e/firebase-fixture';
 
@@ -8,7 +9,7 @@ test('loads public modules and assets through the single gateway', async ({ page
   });
   await page.goto('/');
   await expect(
-    page.getByRole('heading', { name: 'Seu próximo desafio começa aqui.' }),
+    page.getByRole('heading', { name: 'Entre na arena. Conquiste seu lugar.' }),
   ).toBeVisible();
   await page.getByRole('link', { name: 'Apoiadores', exact: true }).click();
   await expect(page.getByRole('article')).toHaveCount(3);
@@ -41,7 +42,7 @@ test('shares the session across auth, player and admin services with isolated fi
   await expect(page.getByRole('heading', { name: 'Minha conta' })).toBeVisible();
   await page.getByRole('link', { name: 'Ver perfil do jogo' }).click();
   await expect(page.getByRole('heading', { name: 'Jogador de teste' })).toBeVisible();
-  await page.getByRole('link', { name: 'Administração', exact: true }).click();
+  await navigateFromMenu(page, 'Administração');
   await expect(page.getByRole('heading', { level: 1, name: 'Administração' })).toBeVisible();
   expect(firebase.getWrites()).toBe(0);
   expect(firebase.getBlocked()).toEqual([]);

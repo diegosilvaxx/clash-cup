@@ -1,167 +1,191 @@
-import styled from 'styled-components';
 import { Link } from 'react-router-dom';
-import { ActionLink, Container } from '@clash-cup/ui';
-import logo from '../assets/logo.png';
-
-const Hero = styled.section`
-  background: #182c59;
-  color: white;
-`;
-const HeroContent = styled(Container)`
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  align-items: center;
-  gap: 64px;
-  padding-top: 76px;
-  padding-bottom: 76px;
-  h1 {
-    font-size: clamp(36px, 4.8vw, 64px);
-    line-height: 1.08;
-    letter-spacing: -2px;
-    margin-bottom: 24px;
-  }
-  p {
-    color: #d7e2fa;
-    max-width: 490px;
-  }
-  @media (max-width: 700px) {
-    grid-template-columns: 1fr;
-    gap: 32px;
-    padding-top: 48px;
-    padding-bottom: 48px;
-  }
-`;
-const Eyebrow = styled.p`
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-`;
-const Illustration = styled.div`
-  max-width: 290px;
-  padding: 32px;
-  background: #fff;
-  border-radius: 28px;
-  justify-self: center;
-  transform: rotate(3deg);
-  img {
-    display: block;
-  }
-  @media (max-width: 700px) {
-    max-width: 190px;
-    padding: 20px;
-  }
-`;
-const SectionHeading = styled.h2`
-  font-size: clamp(26px, 3vw, 36px);
-  letter-spacing: -1px;
-  margin-bottom: 14px;
-`;
-const Cards = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-  margin-top: 32px;
-  @media (max-width: 700px) {
-    grid-template-columns: 1fr;
-  }
-`;
-const Card = styled.article`
-  border: 1px solid #dfe5f0;
-  background: white;
-  border-radius: 16px;
-  padding: 28px;
-  h3 {
-    font-size: 20px;
-    margin-top: 20px;
-  }
-  p {
-    color: #53617b;
-    margin-bottom: 0;
-  }
-  span {
-    display: inline-flex;
-    width: 40px;
-    height: 40px;
-    align-items: center;
-    justify-content: center;
-    background: #eaf0ff;
-    color: #253e78;
-    border-radius: 12px;
-    font-weight: 800;
-  }
-`;
-
-const Actions = styled.nav`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-top: 32px;
-  align-items: center;
-  a {
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-  }
-`;
+import { ActionLink, artwork, Crest, Icon, TournamentTile } from '@clash-cup/ui';
+import { findEmblem } from '@clash-cup/rewards';
+import { useHighlights } from './useHighlights';
+import {
+  HomePage,
+  Hero,
+  HeroActions,
+  SecondaryAction,
+  Pillars,
+  Dashboard,
+  Section,
+  TournamentGrid,
+  RankingPanel,
+  ChestShortcut,
+  EmptyPanel,
+  Community,
+} from './home.styles';
 
 export function Home({ shellOrigin = '' }: { shellOrigin?: string }) {
   const destination = (path: string) => (shellOrigin ? new URL(path, shellOrigin).href : path);
+  const { tournaments, ranking, leaders, retry } = useHighlights();
   return (
-    <>
+    <HomePage>
       <Hero>
-        <HeroContent>
-          <div>
-            <Eyebrow>Clash Cup Brasil</Eyebrow>
-            <h1>Seu próximo desafio começa aqui.</h1>
-            <p>Uma comunidade para jogar, evoluir e competir em torneios online de Clash Royale.</p>
-            <ActionLink href="#como-funciona">Conheça a comunidade</ActionLink>
+        <img
+          className="prince"
+          src={artwork.darkPrince}
+          alt=""
+          width="485"
+          height="581"
+          fetchPriority="high"
+        />
+        <img className="archer" src={artwork.magicArcher} alt="" width="700" height="542" />
+        <div className="hero-copy">
+          <div className="eyebrow">
+            <Icon name="crown" size={19} />A sua comunidade de Clash Royale
           </div>
-          <Illustration>
-            <img src={logo} alt="Clash Cup" width="1488" height="1664" />
-          </Illustration>
-        </HeroContent>
+          <h1>
+            Entre na arena. <span>Conquiste seu lugar.</span>
+          </h1>
+          <p>Dispute torneios, suba no ranking e faça parte da comunidade.</p>
+          <HeroActions>
+            <ActionLink as={Link} to={destination('/torneios')}>
+              Explorar torneios
+              <Icon name="arrow" size={18} />
+            </ActionLink>
+            <SecondaryAction as={Link} to={destination('/ranking')}>
+              <Icon name="ranking" size={18} />
+              Ver ranking
+            </SecondaryAction>
+          </HeroActions>
+        </div>
       </Hero>
-      <Container as="section" id="como-funciona" aria-labelledby="community-title">
-        <Eyebrow>Do seu jeito. No seu ritmo.</Eyebrow>
-        <SectionHeading id="community-title">O lugar de quem gosta de competir.</SectionHeading>
-        <p>
-          Não importa o seu nível: sempre existe espaço para aprender e buscar a próxima vitória.
-        </p>
-        <Cards>
-          <Card>
-            <span aria-hidden="true">01</span>
-            <h3>Jogue de onde estiver</h3>
-            <p>
-              Os torneios acontecem online. Você participa de casa, com o seu próprio dispositivo.
-            </p>
-          </Card>
-          <Card>
-            <span aria-hidden="true">02</span>
-            <h3>Evolua a cada partida</h3>
-            <p>
-              Coloque suas estratégias em prática e compartilhe experiências com outros jogadores.
-            </p>
-          </Card>
-          <Card>
-            <span aria-hidden="true">03</span>
-            <h3>Faça parte da comunidade</h3>
-            <p>
-              Um espaço para jogadores de diferentes níveis que compartilham a paixão por Clash
-              Royale.
-            </p>
-          </Card>
-        </Cards>
-        <Actions aria-label="Comece a participar">
-          <ActionLink as={Link} to={destination('/torneios')}>
-            Explorar torneios
-          </ActionLink>
-          <ActionLink as={Link} to={destination('/cadastro')}>
-            Criar minha conta
-          </ActionLink>
-          <Link to={destination('/ranking')}>Ver classificação</Link>
-        </Actions>
-      </Container>
-    </>
+      <Pillars aria-label="Na Clash Cup">
+        <div>
+          <img src={artwork.tournament} width="46" height="46" alt="" />
+          <div>
+            <strong>COMPITA</strong>
+            <span>Torneios da comunidade</span>
+          </div>
+        </div>
+        <div>
+          <img src={artwork.trophy} width="46" height="46" alt="" />
+          <div>
+            <strong>EVOLUA</strong>
+            <span>Seu lugar no ranking</span>
+          </div>
+        </div>
+        <div>
+          <Crest size={40} />
+          <div>
+            <strong>CONQUISTE</strong>
+            <span>Emblemas exclusivos</span>
+          </div>
+        </div>
+      </Pillars>
+      <Dashboard>
+        <Section aria-labelledby="featured-title">
+          <div className="section-heading">
+            <h2 id="featured-title">Torneios em destaque</h2>
+            <Link to={destination('/torneios')}>
+              Ver todos
+              <Icon name="arrow" size={16} />
+            </Link>
+          </div>
+          {tournaments.status === 'loading' ? (
+            <EmptyPanel role="status">
+              <Icon name="trophy" size={30} />
+              <p>Carregando torneios…</p>
+            </EmptyPanel>
+          ) : tournaments.status === 'error' ? (
+            <EmptyPanel>
+              <p>Não foi possível carregar os torneios em destaque.</p>
+              <button onClick={retry}>Recarregar destaques</button>
+            </EmptyPanel>
+          ) : !tournaments.data?.length ? (
+            <EmptyPanel>
+              <Icon name="trophy" size={32} />
+              <h3>A próxima disputa vem aí.</h3>
+              <p>
+                Nenhum torneio disponível no momento. Acompanhe a comunidade para saber das próximas
+                inscrições.
+              </p>
+            </EmptyPanel>
+          ) : (
+            <TournamentGrid>
+              {tournaments.data.map((item) => (
+                <TournamentTile
+                  key={item.id}
+                  name={item.name}
+                  description={item.description}
+                  date={item.date}
+                  occupied={item.occupied}
+                  capacity={item.capacity}
+                  open={item.open}
+                  to={destination(`/torneios/${encodeURIComponent(item.id)}`)}
+                />
+              ))}
+            </TournamentGrid>
+          )}
+        </Section>
+        <div>
+          <RankingPanel aria-labelledby="ranking-title">
+            <div className="section-heading">
+              <h2 id="ranking-title">
+                <Icon name="trophy" />
+                Ranking da temporada
+              </h2>
+            </div>
+            {ranking.status === 'loading' ? (
+              <p role="status">Carregando ranking…</p>
+            ) : ranking.status === 'error' ? (
+              <p>O ranking está indisponível no momento.</p>
+            ) : !leaders.length ? (
+              <p>A classificação aparecerá aqui quando os primeiros resultados forem publicados.</p>
+            ) : (
+              <ol>
+                {leaders.map((row) => {
+                  const position = leaders.findIndex((leader) => leader.score === row.score) + 1;
+                  const emblem = findEmblem(ranking.data?.badges[row.tag] ?? '');
+                  return (
+                    <li key={row.tag} value={position}>
+                      <span className="position">{position}</span>
+                      {emblem ? (
+                        <img
+                          className="emblem"
+                          src={emblem.image}
+                          alt=""
+                          width="30"
+                          height="30"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <Crest size={25} />
+                      )}
+                      <span className="name">{row.name}</span>
+                      <span className="points">{row.score.toLocaleString('pt-BR')} pts</span>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+            <Link className="all-ranking" to={destination('/ranking')}>
+              Ver classificação
+              <Icon name="arrow" size={17} />
+            </Link>
+          </RankingPanel>
+          <ChestShortcut to={destination('/baus')}>
+            <img src={artwork.chest} width="85" height="80" alt="" loading="lazy" />
+            <div>
+              <strong>Seus próximos baús</strong>
+              <p>Fique de olho nas próximas recompensas.</p>
+              <span>Acompanhar sequência →</span>
+            </div>
+          </ChestShortcut>
+        </div>
+      </Dashboard>
+      <Community id="como-funciona">
+        <div>
+          <h2>Seu próximo desafio começa aqui.</h2>
+          <p>Jogue de onde estiver, evolua a cada partida e faça parte da comunidade.</p>
+        </div>
+        <ActionLink as={Link} to={destination('/cadastro')}>
+          Criar minha conta
+          <Icon name="arrow" size={18} />
+        </ActionLink>
+      </Community>
+    </HomePage>
   );
 }

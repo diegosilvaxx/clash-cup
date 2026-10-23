@@ -7,24 +7,23 @@ import {
   type Competition,
   type Registration,
 } from '@clash-cup/competitions';
-import { Container } from '@clash-cup/ui';
+import { Container, TournamentTile } from '@clash-cup/ui';
 import { Ranking } from './Ranking';
 import { useCompetitionData } from './useCompetitionData';
 import { Actions, Button, Card, Feedback, Grid, Navigation } from './styles';
 
 function TournamentCard({ item }: { item: Competition }) {
   return (
-    <Card>
-      <h2>
-        <Link to={`/torneios/${encodeURIComponent(item.id)}`}>{item.name}</Link>
-      </h2>
-      <p>{item.date || 'Data a confirmar'}</p>
-      <p>
-        {item.occupied} de {item.capacity} vagas ocupadas · {item.remaining} disponíveis
-      </p>
-      {!item.open && <p>Inscrições encerradas</p>}
-      <Link to={`/torneios/${encodeURIComponent(item.id)}`}>Ver detalhes</Link>
-    </Card>
+    <TournamentTile
+      headingLevel="h2"
+      name={item.name}
+      description={item.description}
+      date={item.date}
+      occupied={item.occupied}
+      capacity={item.capacity}
+      open={item.open}
+      to={`/torneios/${encodeURIComponent(item.id)}`}
+    />
   );
 }
 type DetailProps = {

@@ -1,3 +1,4 @@
+import { navigateFromMenu } from './navigation';
 import { expect, test, type Page } from '@playwright/test';
 import { mockFirebase } from './firebase-fixture';
 
@@ -16,9 +17,9 @@ test('signs in, shares the session with the shell, restores it on reload and sig
   await signIn(page);
   await expect(page.getByRole('heading', { name: 'Minha conta' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Sair' })).toBeVisible();
-  await page.getByRole('link', { name: 'Início', exact: true }).click();
+  await navigateFromMenu(page, 'Início');
   await expect(
-    page.getByRole('heading', { name: 'Seu próximo desafio começa aqui.' }),
+    page.getByRole('heading', { name: 'Entre na arena. Conquiste seu lugar.' }),
   ).toBeVisible();
   await page.getByRole('link', { name: 'Minha conta' }).click();
   await page.reload();
@@ -101,9 +102,9 @@ test('keeps the portal usable when the authentication remote is unavailable', as
   await expect(
     page.getByRole('heading', { name: 'Não foi possível carregar o acesso à conta.' }),
   ).toBeVisible();
-  await page.getByRole('link', { name: 'Início', exact: true }).click();
+  await navigateFromMenu(page, 'Início');
   await expect(
-    page.getByRole('heading', { name: 'Seu próximo desafio começa aqui.' }),
+    page.getByRole('heading', { name: 'Entre na arena. Conquiste seu lugar.' }),
   ).toBeVisible();
   await page.unroute('http://127.0.0.1:5302/**');
   await page.getByRole('link', { name: 'Entrar', exact: true }).click();

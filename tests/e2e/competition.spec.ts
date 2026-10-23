@@ -1,3 +1,4 @@
+import { navigateFromMenu } from './navigation';
 import { expect, test, type Page } from '@playwright/test';
 import { mockFirebase } from './firebase-fixture';
 async function signIn(page: Page) {
@@ -13,7 +14,7 @@ test('browses public tournaments and details without requiring login', async ({
 }) => {
   const firebase = await mockFirebase(context);
   await page.goto('/torneios');
-  await page.getByRole('link', { name: 'Ver detalhes' }).click();
+  await page.getByRole('link', { name: 'Ver torneio' }).click();
   await expect(page.getByRole('heading', { name: 'Copa da comunidade' })).toBeVisible();
   await expect(page.getByText('1 de 2 vagas ocupadas · 1 disponíveis')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Entre na sua conta' })).toBeVisible();
@@ -109,13 +110,13 @@ test('loads competition standalone and isolates a failed remote from the portal'
   await expect(
     page.getByRole('heading', { name: 'Não foi possível carregar os torneios.' }),
   ).toBeVisible();
-  await page.getByRole('link', { name: 'Sobre', exact: true }).click();
+  await navigateFromMenu(page, 'Sobre');
   await expect(page.getByRole('heading', { name: 'Sobre a Clash Cup' })).toBeVisible();
   await page.unroute('http://127.0.0.1:5303/**');
-  await page.getByRole('link', { name: 'Torneios', exact: true }).click();
+  await navigateFromMenu(page, 'Torneios');
   await page.getByRole('button', { name: 'Tentar novamente' }).click();
   await expect(page.getByRole('heading', { name: 'Copa da comunidade' })).toBeVisible();
-  await page.getByRole('link', { name: 'Sobre', exact: true }).click();
-  await page.getByRole('link', { name: 'Torneios', exact: true }).click();
+  await navigateFromMenu(page, 'Sobre');
+  await navigateFromMenu(page, 'Torneios');
   await expect(page.getByRole('heading', { name: 'Copa da comunidade' })).toBeVisible();
 });

@@ -1,3 +1,4 @@
+import { navigateFromMenu } from './navigation';
 import { expect, test, type Page } from '@playwright/test';
 import { mockFirebase } from './firebase-fixture';
 async function signIn(page: Page) {
@@ -27,7 +28,7 @@ test('creates and edits a tournament without resetting its registrations', async
 }) => {
   const fixture = await mockFirebase(context, { profile: 'current', access: 'admin' });
   await signIn(page);
-  await page.getByRole('link', { name: 'Administração', exact: true }).click();
+  await navigateFromMenu(page, 'Administração');
   await page
     .getByRole('navigation', { name: 'Administração' })
     .getByRole('link', { name: 'Torneios', exact: true })

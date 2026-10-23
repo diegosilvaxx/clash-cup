@@ -204,6 +204,8 @@ Para configurar o destino dos links que saem das aplicações independentes para
 
 Veja os [detalhes do conteúdo público e da navegação](docs/public-portal.md).
 
+A [identidade visual e a responsividade](docs/design.md) seguem o universo Clash Royale, com componentes compartilhados e dados reais nos destaques da página inicial.
+
 ## Migração
 
 As oito etapas abrangem fundação, autenticação, competições, área do jogador, loja, ranking, administração, conteúdo público e entrega. O repositório inclui CI, configuração de produção, Docker e testes dos ambientes de execução. Não há importação automática de dados anteriores.

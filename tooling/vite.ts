@@ -60,6 +60,18 @@ export function createAppConfig(application: keyof typeof ports) {
       loadEnv(mode, repositoryRoot, 'CUP_').CUP_CONTAINER_BUILD === 'true' || mode === 'vercel';
     return {
       base: container && application !== 'shell' ? `/remotes/${application}/` : '/',
+      experimental: {
+        renderBuiltUrl(filename: string, { hostType, type }: { hostType: string; type: string }) {
+          // Federated modules resolve their images against their own chunk, not the host page.
+          if (
+            hostType === 'js' &&
+            type === 'asset' &&
+            /\.(png|jpe?g|webp|svg|avif)$/.test(filename)
+          )
+            return { relative: true };
+          return undefined;
+        },
+      },
       define:
         mode === 'vercel' ? { 'import.meta.env.VITE_SHELL_URL': 'window.location.origin' } : {},
       root: resolve(repositoryRoot, 'apps', application),

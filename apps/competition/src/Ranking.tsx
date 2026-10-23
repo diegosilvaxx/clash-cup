@@ -14,9 +14,9 @@ import { Actions, Button, Feedback, Navigation } from './styles';
 
 const TableFrame = styled.div`
   overflow-x: auto;
-  border: 1px solid #dbe2ee;
+  border: 1px solid var(--cup-border);
   border-radius: 12px;
-  background: white;
+  background: var(--cup-panel);
   table {
     width: 100%;
     border-collapse: collapse;
@@ -25,7 +25,7 @@ const TableFrame = styled.div`
   th,
   td {
     padding: 16px;
-    border-bottom: 1px solid #dbe2ee;
+    border-bottom: 1px solid var(--cup-border);
   }
   caption {
     padding: 16px;
@@ -38,7 +38,7 @@ const TableFrame = styled.div`
   }
   small {
     display: block;
-    color: #53617b;
+    color: var(--cup-muted);
     margin-top: 6px;
   }
 `;
@@ -55,9 +55,9 @@ const Filters = styled.div`
     min-height: 44px;
     max-width: 100%;
     padding: 8px 12px;
-    border: 1px solid #aab8cf;
+    border: 1px solid #476185;
     border-radius: 8px;
-    background: white;
+    background: var(--cup-panel);
     color: inherit;
   }
 `;
