@@ -57,6 +57,16 @@ O arquivo `.env` local não é enviado à plataforma. Após modificar variáveis
 
 A chave do jogo precisa autorizar o IP público de saída do BFF. A Vercel utiliza IPs dinâmicos por padrão; o IP do domínio do site não é o IP de saída das Functions.
 
+Se `/api/health` responder normalmente, mas uma consulta do jogo falhar, confira o código do JSON e os Runtime Logs da requisição. O BFF registra `Clash Royale request failed` com o código controlado e o status recebido da API, sem token, cabeçalhos ou resposta original.
+
+| Código                       | Significado                                                                          |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| `UPSTREAM_AUTH_FAILED`       | A API respondeu 401 e recusou a credencial do servidor.                              |
+| `UPSTREAM_IP_NOT_ALLOWED`    | A API respondeu 403 com `accessDenied.invalidIp`, confirmando a restrição de IP.     |
+| `UPSTREAM_ACCESS_DENIED`     | A API respondeu 403 sem confirmar bloqueio de IP; confira a configuração de acesso.  |
+| `UPSTREAM_CONNECTION_FAILED` | Falha de conexão ou resolução de nome antes de receber uma resposta HTTP.            |
+| `UPSTREAM_UNAVAILABLE`       | Outra falha; o campo `upstreamStatus` dos logs informa o status HTTP, quando houver. |
+
 Para hospedar o BFF na Vercel, configure [Static IPs](https://vercel.com/docs/networking/static-ips) em uma região compatível com as Functions e cadastre todos os IPs fornecidos na chave do Clash Royale. O recurso depende de plano e contratação na Vercel; a configuração do repositório não o habilita automaticamente.
 
 Se o ambiente não oferecer IP de saída fixo, a alternativa é hospedar o BFF em um servidor que tenha esse IP. Nesse caso, mantenha os frontends na Vercel e substitua a primeira rewrite `/api/(.*)` por um destino HTTPS absoluto, como `https://seu-bff.example/api/$1`. Preserve a validação do token e das permissões no BFF; mova para esse servidor as credenciais administrativas e o token do jogo. Essa alternativa exige configurar e validar o servidor externo antes da publicação.

@@ -1,11 +1,13 @@
 import { AxiosError, AxiosHeaders, CanceledError, type AxiosInstance } from 'axios';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createClashService } from './clash-client';
 
 function mockClient() {
   const get = vi.fn();
   return { get, http: { get } as unknown as AxiosInstance };
 }
+beforeEach(() => vi.spyOn(console, 'error').mockImplementation(() => {}));
+
 describe('Clash Royale adapter', () => {
   it('forwards cancellation to the upstream client without rewriting it as a server error', async () => {
     const { get, http } = mockClient();
@@ -60,5 +62,55 @@ describe('Clash Royale adapter', () => {
     await expect(createClashService('test-token', http).player('P0Y')).rejects.toMatchObject({
       status: 504,
     });
+  });
+  it.each([
+    [401, { reason: 'accessDenied' }, 'UPSTREAM_AUTH_FAILED'],
+    [403, { reason: 'accessDenied.invalidIp' }, 'UPSTREAM_IP_NOT_ALLOWED'],
+    [403, { reason: 'accessDenied' }, 'UPSTREAM_ACCESS_DENIED'],
+    [403, '<html>Forbidden</html>', 'UPSTREAM_ACCESS_DENIED'],
+    [500, { reason: 'accessDenied.invalidIp' }, 'UPSTREAM_UNAVAILABLE'],
+  ])('distinguishes upstream denial %s without guessing the cause', async (status, data, code) => {
+    const { get, http } = mockClient();
+    get.mockRejectedValue(
+      new AxiosError('private upstream message', undefined, undefined, undefined, {
+        status,
+        statusText: '',
+        headers: {},
+        config: { headers: new AxiosHeaders({ Authorization: 'Bearer private-token' }) },
+        data,
+      }),
+    );
+    await expect(createClashService('private-token', http).player('P0Y')).rejects.toMatchObject({
+      status: 502,
+      code,
+    });
+    expect(console.error).toHaveBeenCalledWith('Clash Royale request failed', {
+      code,
+      upstreamStatus: status,
+    });
+    expect(JSON.stringify(vi.mocked(console.error).mock.calls)).not.toContain('private');
+  });
+  it.each(['ENOTFOUND', 'EAI_AGAIN', 'ECONNREFUSED', 'ECONNRESET', 'ERR_NETWORK'])(
+    'identifies connection failure %s without exposing request details',
+    async (code) => {
+      const { get, http } = mockClient();
+      get.mockRejectedValue(new AxiosError('private connection details', code));
+      await expect(createClashService('test-token', http).player('P0Y')).rejects.toMatchObject({
+        status: 502,
+        code: 'UPSTREAM_CONNECTION_FAILED',
+      });
+      expect(console.error).toHaveBeenCalledWith('Clash Royale request failed', {
+        code: 'UPSTREAM_CONNECTION_FAILED',
+        upstreamStatus: null,
+      });
+    },
+  );
+  it('does not report browser cancellation as an upstream failure', async () => {
+    const { get, http } = mockClient();
+    get.mockRejectedValue(new CanceledError('cancelled'));
+    await expect(createClashService('test-token', http).player('P0Y')).rejects.toMatchObject({
+      code: 'ERR_CANCELED',
+    });
+    expect(console.error).not.toHaveBeenCalled();
   });
 });
