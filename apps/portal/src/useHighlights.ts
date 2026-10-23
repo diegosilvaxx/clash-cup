@@ -13,7 +13,7 @@ export function useHighlights() {
   const [ranking, setRanking] = useState<Resource<RankingData>>({ status: 'loading', data: null });
   useEffect(() => {
     let active = true;
-    void competitions.list().then(
+    void competitions.list({ force: revision > 0 }).then(
       (result) => {
         if (active)
           setTournaments({
@@ -27,7 +27,7 @@ export function useHighlights() {
         if (active) setTournaments({ status: 'error', data: null });
       },
     );
-    void rewards.ranking().then(
+    void rewards.ranking({ history: false, badges: false, force: revision > 0 }).then(
       (result) => {
         if (active) setRanking({ status: 'ready', data: result });
       },

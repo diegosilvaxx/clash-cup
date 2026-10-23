@@ -15,18 +15,22 @@ type Result = {
   registrationError: string | null;
 };
 const initial: Result = { data: null, loading: true, error: null, registrationError: null };
-export function useCompetitionData(user: SessionUser | null, revision: number) {
+export function useCompetitionData(
+  user: SessionUser | null,
+  revision: number,
+  includeRegistrations = true,
+) {
   const [state, setState] = useState<Result & { key: string }>({ ...initial, key: '' });
   const identity = JSON.stringify([user?.uid ?? null, user?.emailVerified ?? false]);
-  const key = `${identity}:${revision}`;
+  const key = `${identity}:${revision}:${includeRegistrations}`;
   useEffect(() => {
     let active = true;
     async function load() {
       try {
-        const catalog = await competitions.list();
+        const catalog = await competitions.list({ force: revision > 0 });
         let registrations: Registration[] = [];
         let registrationError: string | null = null;
-        if (user) {
+        if (user && includeRegistrations) {
           try {
             registrations = await competitions.registrations(
               user,
@@ -60,7 +64,7 @@ export function useCompetitionData(user: SessionUser | null, revision: number) {
     return () => {
       active = false;
     };
-  }, [key, user]);
+  }, [key, user, revision, includeRegistrations]);
   if (state.key === key) return state;
   return state.key.startsWith(`${identity}:`) ? { ...state, loading: true } : initial;
 }

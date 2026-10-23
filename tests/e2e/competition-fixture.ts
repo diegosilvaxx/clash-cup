@@ -107,6 +107,7 @@ export function createCompetitionFixture(options: CompetitionFixtureOptions = {}
         });
     }
   }
+  const queryCounts: Record<string, number> = {};
   async function handle(
     route: Route,
     reply: (options: NonNullable<Parameters<Route['fulfill']>[0]>) => Promise<void>,
@@ -128,7 +129,9 @@ export function createCompetitionFixture(options: CompetitionFixtureOptions = {}
         };
       };
       const parent = decodeURIComponent(path.slice('/v1/'.length).replace(/:runQuery$/, ''));
-      const prefix = parent + '/' + body.structuredQuery.from[0]!.collectionId + '/';
+      const name = body.structuredQuery.from[0]!.collectionId;
+      queryCounts[name] = (queryCounts[name] ?? 0) + 1;
+      const prefix = parent + '/' + name + '/';
       const filter = body.structuredQuery.where?.fieldFilter;
       const matches = [...documents.values()].filter(
         (document) =>
@@ -247,6 +250,7 @@ export function createCompetitionFixture(options: CompetitionFixtureOptions = {}
         .get(base + 'shop/#P0Y')
         ?.fields.emotesBuy?.arrayValue?.values?.map((value) => value.stringValue) ?? [],
     getCommits: () => commits,
+    getQueryCounts: () => ({ ...queryCounts }),
     getOccupied: () => {
       const value = documents.get(base + 'tournament/cup')?.fields.vacanciesAvailable;
       return Number(value?.integerValue ?? value?.stringValue);

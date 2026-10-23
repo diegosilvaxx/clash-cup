@@ -197,7 +197,7 @@ function CompetitionContent() {
   const state = useSession();
   const location = useLocation();
   const [revision, setRevision] = useState(0);
-  const result = useCompetitionData(state.user, revision);
+  const result = useCompetitionData(state.user, revision, location.pathname !== '/torneios');
   const refresh = () => setRevision((value) => value + 1);
   return (
     <Container>

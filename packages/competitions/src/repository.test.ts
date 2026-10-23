@@ -1,3 +1,4 @@
+import { createReadCache } from '../../firebase/src/read-cache';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PlayerProfile, SessionUser } from '@clash-cup/session';
 import { createCompetitionRepository, parseCompetition } from './index';
@@ -12,6 +13,7 @@ const mocks = vi.hoisted(() => ({
   sessionChange: false,
 }));
 vi.mock('@clash-cup/firebase', () => ({
+  createReadCache,
   getFirebaseApp: () => ({}),
   getAuth: () => ({ currentUser: { uid: mocks.uid } }),
   getFirestore: () => ({}),
@@ -158,5 +160,25 @@ describe('transactional registrations', () => {
     await repository.registrations({ ...user, emailVerified: false }, []);
     expect(mocks.query).toHaveBeenCalledTimes(1);
     expect(mocks.query).toHaveBeenCalledWith('competitionRegistrations/user-a/tournaments');
+  });
+});
+
+describe('catalog read volume', () => {
+  it('coalesces repeated catalog reads and honors explicit refresh', async () => {
+    const local = createCompetitionRepository();
+    await Promise.all([local.list(), local.list(), local.list()]);
+    await local.list();
+    expect(mocks.query).toHaveBeenCalledTimes(1);
+    await local.list({ force: true });
+    expect(mocks.query).toHaveBeenCalledTimes(2);
+  });
+  it('invalidates the public catalog after a committed registration', async () => {
+    const local = createCompetitionRepository();
+    await local.list();
+    await local.join({ ...user, emailVerified: false }, profile, 'cup', [
+      parseCompetition('cup', record),
+    ]);
+    await local.list();
+    expect(mocks.query.mock.calls.filter((call) => call[0] === 'tournament')).toHaveLength(2);
   });
 });

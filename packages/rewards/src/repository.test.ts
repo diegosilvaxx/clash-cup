@@ -1,3 +1,4 @@
+import { createReadCache } from '../../firebase/src/read-cache';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { PlayerProfile } from '@clash-cup/session';
 import { createRewardRepository } from './index';
@@ -12,6 +13,7 @@ const mocks = vi.hoisted(() => ({
   fail: false,
 }));
 vi.mock('@clash-cup/firebase', () => ({
+  createReadCache,
   getFirebaseApp: () => ({}),
   getFirestore: () => ({}),
   getAuth: () => ({ currentUser: { uid: mocks.uid } }),
@@ -149,5 +151,30 @@ describe('atomic shop purchases', () => {
       history: [],
       badgesUnavailable: true,
     });
+  });
+});
+
+describe('ranking read volume', () => {
+  it('does not read history or wallets for homepage highlights', async () => {
+    const local = createRewardRepository();
+    await local.ranking({ history: false, badges: false });
+    expect(mocks.query.mock.calls.map((call) => call[0])).toEqual(['ranking']);
+  });
+  it('reuses current standings and reads history only when requested', async () => {
+    const local = createRewardRepository();
+    await Promise.all([
+      local.ranking({ history: false, badges: false }),
+      local.ranking({ history: false, badges: false }),
+    ]);
+    await local.ranking({ history: false });
+    expect(mocks.query.mock.calls.map((call) => call[0])).toEqual(['ranking', 'shop']);
+    await local.ranking();
+    expect(mocks.query.mock.calls.map((call) => call[0])).toEqual([
+      'ranking',
+      'shop',
+      'rankingHistory',
+    ]);
+    await local.ranking();
+    expect(mocks.query).toHaveBeenCalledTimes(3);
   });
 });

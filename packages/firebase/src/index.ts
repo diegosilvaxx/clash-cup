@@ -61,3 +61,5 @@ export function getFirebaseApp(env: Record<string, unknown> = import.meta.env) {
   const config = readFirebaseConfig(env);
   return getApps().find((app) => app.name === 'clash-cup') ?? initializeApp(config, 'clash-cup');
 }
+
+export { createReadCache, type ReadOptions } from './read-cache';

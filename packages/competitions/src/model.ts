@@ -90,6 +90,8 @@ export function resolveLegacyRegistration(
 export function competitionError(error: unknown) {
   if (error instanceof CompetitionError) return error.message;
   const code = typeof error === 'object' && error && 'code' in error ? String(error.code) : '';
+  if (code === 'resource-exhausted')
+    return 'O Firestore atingiu um limite de uso. Tente novamente mais tarde.';
   if (code === 'configuration-missing')
     return 'Os torneios ainda não estão configurados neste ambiente.';
   if (code === 'permission-denied')

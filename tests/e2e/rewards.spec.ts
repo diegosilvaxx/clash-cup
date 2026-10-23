@@ -90,9 +90,9 @@ test('lists public standings, annual totals, monthly history and recovers read f
   fixture.competition.deny(false);
   await page.getByRole('button', { name: 'Tentar novamente' }).click();
   await expect(page.getByRole('row').filter({ hasText: 'Jogador de teste' })).toContainText('0');
-  await page.getByLabel('Classificação').selectOption('year');
+  await page.getByRole('combobox', { name: /Classificação/ }).selectOption('year');
   await expect(page.getByRole('row').filter({ hasText: 'Jogador de teste' })).toContainText('5');
-  await page.getByLabel('Classificação').selectOption('month');
+  await page.getByRole('combobox', { name: /Classificação/ }).selectOption('month');
   await page.getByLabel('Período').selectOption('2026-01');
   await expect(page.getByRole('row').filter({ hasText: 'Jogador de teste' })).toContainText('3');
   await page.goto('http://127.0.0.1:5303/ranking');

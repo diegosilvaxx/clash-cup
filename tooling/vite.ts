@@ -93,6 +93,20 @@ export function createAppConfig(application: keyof typeof ports) {
             'react-router-dom': { singleton: true, requiredVersion: '7.18.4' },
             'react-router': { singleton: true, requiredVersion: '7.18.4' },
             'styled-components': { singleton: true, requiredVersion: '6.5.3' },
+            ...Object.fromEntries(
+              ['competitions', 'rewards'].map((name) => [
+                `@clash-cup/${name}`,
+                {
+                  singleton: true,
+                  version: '0.1.0',
+                  requiredVersion: '0.1.0',
+                  import: resolve(repositoryRoot, `packages/${name}/src/index.ts`).replaceAll(
+                    '\\',
+                    '/',
+                  ),
+                },
+              ]),
+            ),
             '@clash-cup/firebase': {
               singleton: true,
               version: '0.1.0',
@@ -116,7 +130,11 @@ export function createAppConfig(application: keyof typeof ports) {
         ...(application === 'shell' ? [runtimeConfigPlugin(mode)] : []),
       ],
       resolve: {
-        alias: aliases,
+        alias: Object.fromEntries(
+          Object.entries(aliases).filter(
+            ([name]) => !['@clash-cup/competitions', '@clash-cup/rewards'].includes(name),
+          ),
+        ),
         dedupe: ['react', 'react-dom', 'react-router', 'react-router-dom', 'styled-components'],
       },
       server: {

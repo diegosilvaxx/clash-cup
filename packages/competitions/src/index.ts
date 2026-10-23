@@ -1,5 +1,7 @@
 import {
   collection,
+  createReadCache,
+  type ReadOptions,
   doc,
   getDocs,
   getFirestore,
@@ -24,6 +26,7 @@ export * from './model';
 export function createCompetitionRepository(
   database: () => Firestore = () => getFirestore(getFirebaseApp()),
 ) {
+  const cache = createReadCache();
   function assertUser(user: SessionUser) {
     if (getAuth(getFirebaseApp()).currentUser?.uid !== user.uid)
       throw new CompetitionError('Sua sessão mudou. Entre novamente para continuar.');
@@ -43,27 +46,33 @@ export function createCompetitionRepository(
     );
   }
   return {
-    async list(): Promise<{
+    async list(options: ReadOptions = {}): Promise<{
       items: Competition[];
       invalid: number;
       legacyIds: ReadonlyMap<string, readonly string[]>;
     }> {
-      const result = await getDocs(collection(database(), 'tournament'));
-      const items: Competition[] = [];
-      let invalid = 0;
-      const legacyIds = new Map<string, string[]>();
-      for (const document of result.docs) {
-        const data = document.data();
-        if (typeof data.id === 'string')
-          legacyIds.set(data.id, [...(legacyIds.get(data.id) ?? []), document.id]);
-        try {
-          items.push(parseCompetition(document.id, document.data()));
-        } catch {
-          ++invalid;
-        }
-      }
-      items.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR') || a.id.localeCompare(b.id));
-      return { items, invalid, legacyIds };
+      return cache.read(
+        'catalog',
+        async () => {
+          const result = await getDocs(collection(database(), 'tournament'));
+          const items: Competition[] = [];
+          let invalid = 0;
+          const legacyIds = new Map<string, string[]>();
+          for (const document of result.docs) {
+            const data = document.data();
+            if (typeof data.id === 'string')
+              legacyIds.set(data.id, [...(legacyIds.get(data.id) ?? []), document.id]);
+            try {
+              items.push(parseCompetition(document.id, document.data()));
+            } catch {
+              ++invalid;
+            }
+          }
+          items.sort((a, b) => a.name.localeCompare(b.name, 'pt-BR') || a.id.localeCompare(b.id));
+          return { items, invalid, legacyIds };
+        },
+        options,
+      );
     },
     async registrations(
       user: SessionUser,
@@ -119,7 +128,7 @@ export function createCompetitionRepository(
         'tournaments',
         tournamentId,
       );
-      return runTransaction(db, async (transaction) => {
+      const result = await runTransaction(db, async (transaction) => {
         assertUser(user);
         const tournament = await transaction.get(tournamentRef);
         const registration = await transaction.get(registrationRef);
@@ -143,6 +152,8 @@ export function createCompetitionRepository(
         });
         return 'created' as const;
       });
+      cache.invalidate('catalog');
+      return result;
     },
     async cancel(user: SessionUser, tournamentId: string) {
       assertUser(user);
@@ -155,7 +166,7 @@ export function createCompetitionRepository(
         'tournaments',
         tournamentId,
       );
-      return runTransaction(db, async (transaction) => {
+      const result = await runTransaction(db, async (transaction) => {
         assertUser(user);
         const tournament = await transaction.get(tournamentRef);
         const registration = await transaction.get(registrationRef);
@@ -176,6 +187,8 @@ export function createCompetitionRepository(
         transaction.delete(registrationRef);
         return 'cancelled' as const;
       });
+      cache.invalidate('catalog');
+      return result;
     },
   };
 }

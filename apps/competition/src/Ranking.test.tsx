@@ -33,16 +33,19 @@ function mount() {
 describe('public rankings', () => {
   it('shows a single zero-score participant and aggregates/filter histories', async () => {
     mount();
-    const table = await screen.findByRole('table');
+    let table = await screen.findByRole('table');
     expect(within(table).getByText('0')).toBeVisible();
     fireEvent.change(screen.getByLabelText('Classificação'), { target: { value: 'year' } });
-    expect(within(table).getByText('5')).toBeVisible();
+    table = await screen.findByRole('table');
+    expect(await within(table).findByText('5')).toBeVisible();
     fireEvent.change(screen.getByLabelText('Classificação'), { target: { value: 'month' } });
     expect(screen.getByLabelText('Período')).toHaveValue('2026-02');
     expect(within(table).getByText('2')).toBeVisible();
     fireEvent.change(screen.getByLabelText('Período'), { target: { value: '2026-01' } });
     expect(within(table).getByText('3')).toBeVisible();
-    expect(mocks.ranking).toHaveBeenCalledTimes(1);
+    expect(mocks.ranking).toHaveBeenCalledTimes(2);
+    expect(mocks.ranking).toHaveBeenNthCalledWith(1, { history: false, force: false });
+    expect(mocks.ranking).toHaveBeenNthCalledWith(2, { history: true, force: false });
   });
   it('recovers read failures and displays an empty classification', async () => {
     mocks.ranking.mockRejectedValueOnce(new Error('failed')).mockResolvedValue({

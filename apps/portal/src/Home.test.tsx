@@ -57,6 +57,7 @@ describe('community home', () => {
     expect(screen.getByText('48 / 64 jogadores')).toBeVisible();
     const standings = screen.getByRole('region', { name: 'Ranking da temporada' });
     expect(await within(standings).findByText('Líder real')).toBeVisible();
+    expect(mocks.ranking).toHaveBeenCalledWith({ history: false, badges: false, force: false });
     expect(within(standings).getByText('0 pts')).toBeVisible();
     expect(screen.getByRole('progressbar')).toHaveAttribute('value', '48');
   });

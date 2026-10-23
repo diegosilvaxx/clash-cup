@@ -5,6 +5,8 @@ export class RewardError extends Error {}
 export function rewardError(error: unknown) {
   if (error instanceof RewardError) return error.message;
   const code = error && typeof error === 'object' && 'code' in error ? error.code : null;
+  if (code === 'resource-exhausted')
+    return 'O Firestore atingiu um limite de uso. Tente novamente mais tarde.';
   if (code === 'configuration-missing') return 'O Firebase ainda não está configurado.';
   if (code === 'permission-denied')
     return 'Sua conta não tem permissão para esta operação. Peça à organização que confira seu vínculo e as permissões.';

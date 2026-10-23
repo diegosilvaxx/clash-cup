@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -65,26 +65,32 @@ export function Ranking() {
   const [revision, setRevision] = useState(0);
   const [result, setResult] = useState<{
     revision: number;
+    history: boolean;
     data: RankingData | null;
     error: string | null;
   } | null>(null);
   const [filter, setFilter] = useState<RankingFilter>({ mode: 'current', period: '' });
   const [page, setPage] = useState(1);
+  const needsHistory = filter.mode !== 'current';
+  const lastRevision = useRef(revision);
   useEffect(() => {
     let active = true;
-    void rewards.ranking().then(
+    const force = lastRevision.current !== revision;
+    lastRevision.current = revision;
+    void rewards.ranking({ history: needsHistory, force }).then(
       (data) => {
-        if (active) setResult({ revision, data, error: null });
+        if (active) setResult({ revision, history: needsHistory, data, error: null });
       },
       (error) => {
-        if (active) setResult({ revision, data: null, error: rewardError(error) });
+        if (active)
+          setResult({ revision, history: needsHistory, data: null, error: rewardError(error) });
       },
     );
     return () => {
       active = false;
     };
-  }, [revision]);
-  const loading = result?.revision !== revision;
+  }, [revision, needsHistory]);
+  const loading = result?.revision !== revision || result?.history !== needsHistory;
   const data = loading ? null : result?.data;
   const years = data
     ? [...new Set(data.history.map((row) => String(row.year)))].sort().reverse()

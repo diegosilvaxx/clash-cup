@@ -1,5 +1,7 @@
 import {
   collection,
+  createReadCache,
+  type ReadOptions,
   doc,
   getAuth,
   getDocs,
@@ -20,6 +22,7 @@ export * from './model';
 export function createRewardRepository(
   database: () => Firestore = () => getFirestore(getFirebaseApp()),
 ) {
+  const cache = createReadCache();
   function assertUser(profile: PlayerProfile) {
     if (getAuth(getFirebaseApp()).currentUser?.uid !== profile.uid)
       throw new RewardError('Sua sessão mudou. Entre novamente para continuar.');
@@ -47,7 +50,7 @@ export function createRewardRepository(
       if (!item) throw new RewardError('Este emblema não está disponível.');
       const db = database();
       const reference = doc(db, 'shop', walletId);
-      return runTransaction(db, async (transaction) => {
+      const result = await runTransaction(db, async (transaction) => {
         assertUser(profile);
         const snapshot = await transaction.get(reference);
         assertUser(profile);
@@ -81,13 +84,21 @@ export function createRewardRepository(
         });
         return updated;
       });
+      cache.invalidate('badges');
+      return result;
     },
-    async ranking(): Promise<RankingData> {
+    async ranking(
+      options: ReadOptions & { history?: boolean; badges?: boolean } = {},
+    ): Promise<RankingData> {
       const db = database();
       const [current, history, badges] = await Promise.allSettled([
-        getDocs(collection(db, 'ranking')),
-        getDocs(collection(db, 'rankingHistory')),
-        getDocs(collection(db, 'shop')),
+        cache.read('current', () => getDocs(collection(db, 'ranking')), options),
+        options.history === false
+          ? Promise.resolve({ docs: [] })
+          : cache.read('history', () => getDocs(collection(db, 'rankingHistory')), options),
+        options.badges === false
+          ? Promise.resolve({ docs: [] })
+          : cache.read('badges', () => getDocs(collection(db, 'shop')), options),
       ]);
       if (current.status === 'rejected') throw current.reason;
       if (history.status === 'rejected') throw history.reason;
