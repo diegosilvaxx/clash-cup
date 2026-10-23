@@ -41,7 +41,7 @@ async function visit(directory) {
     if (
       app &&
       app !== 'api' &&
-      /CLASH_ROYALE_API_TOKEN|GOOGLE_APPLICATION_CREDENTIALS|FIREBASE_ADMIN_PRIVATE_KEY|FIREBASE_ADMIN_CLIENT_EMAIL|api\.clashroyale\.com/.test(
+      /CLASH_ROYALE_API_TOKEN|CLASH_ROYALE_API_PROVIDER|GOOGLE_APPLICATION_CREDENTIALS|FIREBASE_ADMIN_PRIVATE_KEY|FIREBASE_ADMIN_CLIENT_EMAIL|api\.clashroyale\.com|proxy\.royaleapi\.dev/.test(
         source,
       )
     )

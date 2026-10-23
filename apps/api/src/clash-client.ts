@@ -70,16 +70,30 @@ function upstreamFailure(error: unknown): ApiError {
 export function createClashService(
   token: string | undefined,
   client?: AxiosInstance,
+  provider?: string,
 ): ClashService {
+  const selected = provider?.trim() || 'official';
+  const baseURL =
+    selected === 'official'
+      ? 'https://api.clashroyale.com/v1'
+      : selected === 'royaleapi'
+        ? 'https://proxy.royaleapi.dev/v1'
+        : undefined;
   const http =
     client ??
     axios.create({
-      baseURL: 'https://api.clashroyale.com/v1',
+      ...(baseURL ? { baseURL } : {}),
       timeout: 10_000,
       maxRedirects: 0,
       headers: { Accept: 'application/json', Authorization: token ? `Bearer ${token}` : '' },
     });
   async function request(path: string, schema: z.ZodType, signal?: AbortSignal) {
+    if (!baseURL)
+      throw new ApiError(
+        503,
+        'API_PROVIDER_NOT_CONFIGURED',
+        'Configure um provedor válido para a integração com Clash Royale.',
+      );
     if (!token?.trim())
       throw new ApiError(
         503,

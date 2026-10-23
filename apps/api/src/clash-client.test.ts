@@ -1,4 +1,10 @@
-import { AxiosError, AxiosHeaders, CanceledError, type AxiosInstance } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosHeaders,
+  CanceledError,
+  type AxiosInstance,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createClashService } from './clash-client';
 
@@ -9,6 +15,53 @@ function mockClient() {
 beforeEach(() => vi.spyOn(console, 'error').mockImplementation(() => {}));
 
 describe('Clash Royale adapter', () => {
+  it.each([
+    [undefined, 'https://api.clashroyale.com/v1'],
+    ['', 'https://api.clashroyale.com/v1'],
+    ['official', 'https://api.clashroyale.com/v1'],
+    ['royaleapi', 'https://proxy.royaleapi.dev/v1'],
+  ])('sends all game queries through provider %s', async (provider, baseURL) => {
+    const create = axios.create.bind(axios);
+    const adapter = vi.fn(async (config: InternalAxiosRequestConfig) => ({
+      config,
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      data: config.url?.includes('upcomingchests')
+        ? { items: [] }
+        : config.url?.includes('/tournaments/')
+          ? { tag: '#P0Y', name: 'Cup', membersList: [] }
+          : { tag: '#P0Y', name: 'Player' },
+    }));
+    vi.spyOn(axios, 'create').mockImplementationOnce((config) => create({ ...config, adapter }));
+    const service = createClashService('test-token', undefined, provider);
+    await service.player('P0Y');
+    await service.upcomingChests('P0Y');
+    await service.tournament('P0Y');
+    expect(adapter.mock.calls.map(([config]) => axios.getUri(config))).toEqual([
+      `${baseURL}/players/%23P0Y`,
+      `${baseURL}/players/%23P0Y/upcomingchests`,
+      `${baseURL}/tournaments/%23P0Y`,
+    ]);
+    for (const [config] of adapter.mock.calls) {
+      expect(config.headers.get('Authorization')).toBe('Bearer test-token');
+      expect(config.timeout).toBe(10_000);
+      expect(config.maxRedirects).toBe(0);
+    }
+  });
+  it.each(['invalid', 'https://untrusted.example', 'royaleapi/players'])(
+    'rejects unsupported provider %s before sending credentials',
+    async (provider) => {
+      const { get, http } = mockClient();
+      const service = createClashService('test-token', http, provider);
+      for (const query of [service.player, service.upcomingChests, service.tournament])
+        await expect(query('P0Y')).rejects.toMatchObject({
+          status: 503,
+          code: 'API_PROVIDER_NOT_CONFIGURED',
+        });
+      expect(get).not.toHaveBeenCalled();
+    },
+  );
   it('forwards cancellation to the upstream client without rewriting it as a server error', async () => {
     const { get, http } = mockClient();
     const signal = new AbortController().signal;

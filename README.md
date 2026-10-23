@@ -23,6 +23,8 @@ Copy-Item .env.example .env
 
 Para consultar jogadores, baús e torneios na API oficial, configure `CLASH_ROYALE_API_TOKEN` no `.env`. O portal e a verificação de saúde funcionam sem token; as consultas externas retornam uma mensagem de integração não configurada.
 
+Em hospedagens sem IP fixo, como a Vercel gratuita, é possível selecionar o proxy da RoyaleAPI com `CLASH_ROYALE_API_PROVIDER=royaleapi`. Veja a [configuração do proxy e da chave](docs/deployment.md#proxy-da-royaleapi).
+
 Para login e vínculo do jogador, preencha os quatro campos `VITE_FIREBASE_*` e confira a [configuração da autenticação](docs/authentication.md), incluindo métodos de login, domínio autorizado e regras do Firestore. Sem essa configuração, o portal público permanece acessível e o login informa a indisponibilidade.
 
 Para o painel administrativo, configure também as credenciais do servidor e o primeiro responsável conforme [Administração](docs/administration.md).

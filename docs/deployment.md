@@ -43,6 +43,7 @@ Os serviços mantêm `root: "."` para instalar os workspaces pelo lockfile da ra
 | `VITE_FIREBASE_APP_ID`        | Identificador do app Web Firebase                                  |
 | `VITE_VIP_SUPPORT_URL`        | Endereço de apoio, atualmente `https://patreon.com/clashcupbrasil` |
 | `CLASH_ROYALE_API_TOKEN`      | Token do jogo, usado somente pelo BFF                              |
+| `CLASH_ROYALE_API_PROVIDER`   | `official` (padrão) ou `royaleapi` para utilizar o proxy           |
 | `FIREBASE_PROJECT_ID`         | Mesmo projeto Firebase utilizado no frontend                       |
 | `FIREBASE_ADMIN_CLIENT_EMAIL` | Campo `client_email` do JSON da conta de serviço                   |
 | `FIREBASE_ADMIN_PRIVATE_KEY`  | Campo `private_key` do JSON da conta de serviço                    |
@@ -67,7 +68,30 @@ Se `/api/health` responder normalmente, mas uma consulta do jogo falhar, confira
 | `UPSTREAM_CONNECTION_FAILED` | Falha de conexão ou resolução de nome antes de receber uma resposta HTTP.            |
 | `UPSTREAM_UNAVAILABLE`       | Outra falha; o campo `upstreamStatus` dos logs informa o status HTTP, quando houver. |
 
-Para hospedar o BFF na Vercel, configure [Static IPs](https://vercel.com/docs/networking/static-ips) em uma região compatível com as Functions e cadastre todos os IPs fornecidos na chave do Clash Royale. O recurso depende de plano e contratação na Vercel; a configuração do repositório não o habilita automaticamente.
+### Proxy da RoyaleAPI
+
+Para utilizar o BFF na Vercel gratuita, o servidor pode encaminhar as consultas pelo proxy da RoyaleAPI. Esse é um serviço de terceiros: ele recebe o token do jogo ao encaminhar as chamadas e passa a fazer parte da disponibilidade da integração. As credenciais administrativas do Firebase continuam no BFF e não são enviadas ao proxy.
+
+1. No [portal de desenvolvedores do Clash Royale](https://developer.clashroyale.com/), crie uma chave específica para esse deploy, autorizando o IP `45.79.218.79`, informado na [documentação da RoyaleAPI](https://docs.royaleapi.com/proxy.html).
+2. Na Vercel, abra **Settings → Environment Variables** e configure para **Production**:
+
+   ```dotenv
+   CLASH_ROYALE_API_PROVIDER=royaleapi
+   CLASH_ROYALE_API_TOKEN=TOKEN_DA_NOVA_CHAVE
+   ```
+
+   Informe somente o token, sem o prefixo `Bearer`. Configure também em Preview se quiser testar nesse ambiente.
+
+3. Gere um novo deploy após salvar as variáveis.
+4. Confira `/api/health`, `/api/player?idclash=89CLLQ08R` e `/api/upcomingchests?idclash=89CLLQ08R`. A saúde confirma o BFF; as outras consultas verificam a chave e o proxy.
+
+Com `royaleapi`, o BFF usa exclusivamente `https://proxy.royaleapi.dev/v1`. As três consultas de jogo usam o mesmo provedor; o navegador continua acessando `/api/*`. Não há troca automática de provedor após falhas. A configuração aceita apenas `official` e `royaleapi`, impedindo destinos arbitrários para o token. Um valor inválido mantém a saúde disponível e retorna `API_PROVIDER_NOT_CONFIGURED` nas consultas externas.
+
+Para testar localmente ou com Docker, configure essas mesmas variáveis no `.env` e reinicie o BFF. Para voltar à API direta, utilize `CLASH_ROYALE_API_PROVIDER=official` e uma chave que autorize o IP de saída desse ambiente.
+
+### API direta com IP fixo
+
+Para consultar diretamente o Clash Royale a partir da Vercel, configure [Static IPs](https://vercel.com/docs/networking/static-ips) em uma região compatível com as Functions e cadastre todos os IPs fornecidos na chave do jogo. O recurso depende de plano e contratação na Vercel; a configuração do repositório não o habilita automaticamente.
 
 Se o ambiente não oferecer IP de saída fixo, a alternativa é hospedar o BFF em um servidor que tenha esse IP. Nesse caso, mantenha os frontends na Vercel e substitua a primeira rewrite `/api/(.*)` por um destino HTTPS absoluto, como `https://seu-bff.example/api/$1`. Preserve a validação do token e das permissões no BFF; mova para esse servidor as credenciais administrativas e o token do jogo. Essa alternativa exige configurar e validar o servidor externo antes da publicação.
 

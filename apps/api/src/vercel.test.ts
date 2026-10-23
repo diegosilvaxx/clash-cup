@@ -43,6 +43,16 @@ function invocation(url: string, method = 'GET', body?: string) {
 afterEach(() => vi.unstubAllEnvs());
 
 describe('Vercel HTTP entrypoint', () => {
+  it('keeps health available with an invalid provider and refuses external queries', async () => {
+    const handler = createApiHandler(createClashService('test-token', undefined, 'invalid'));
+    const health = invocation('/api/health');
+    await handler(health.request, health.nodeResponse);
+    expect(health.response.status).toBe(200);
+    const profile = invocation('/api/player?idclash=P0Y');
+    await handler(profile.request, profile.nodeResponse);
+    expect(profile.response.status).toBe(503);
+    expect(JSON.parse(profile.response.body).error.code).toBe('API_PROVIDER_NOT_CONFIGURED');
+  });
   it('exports a callable handler and answers health without token, credentials or a listener', async () => {
     vi.stubEnv('CLASH_ROYALE_API_TOKEN', '');
     vi.stubEnv('FIREBASE_PROJECT_ID', '');
