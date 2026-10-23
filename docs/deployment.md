@@ -8,6 +8,8 @@ Cada serviço tem instalação, build e diretório de saída definidos. As depen
 
 Essa configuração segue o modelo atual de [Vercel Services](https://vercel.com/kb/guide/vercel-services). Serviços no mesmo projeto são publicados juntos. O Docker é uma opção local e não é enviado à Vercel.
 
+O `package.json` fixa `jose@5.10.0` somente na dependência de `jwks-rsa`, usada pelo Firebase Admin. Essa versão oferece uma entrada CommonJS e evita `ERR_REQUIRE_ESM` nos ambientes que não permitem `require()` de módulos ESM. Mantenha o `package-lock.json` atualizado junto com esse override. O teste `firebase-compatibility.test.ts` carrega as dependências reais em outro processo Node com esse recurso desativado e verifica uma assinatura usando uma chave JWKS local, sem credenciais ou chamadas externas. Reavalie o override quando a cadeia de dependências corrigir o carregamento, conforme o [relato no Firebase Admin](https://github.com/firebase/firebase-admin-node/issues/3181).
+
 ## Chamadas e bindings
 
 | Origem da chamada                                    | Destino                             | Caminho utilizado                      |

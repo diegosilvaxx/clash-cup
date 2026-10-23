@@ -11,6 +11,11 @@
     "node": ">=24.21.0 <25",
     "npm": ">=10"
   },
+  "overrides": {
+    "jwks-rsa": {
+      "jose": "5.10.0"
+    }
+  },
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:shell": "npm run dev --workspace @clash-cup/shell",
